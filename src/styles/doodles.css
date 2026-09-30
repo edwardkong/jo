@@ -1,3 +1,94 @@
-/* STUB — replaced by the doodle build agent. */
-.doodle-slot { display: inline-block; width: var(--slot-w); height: var(--slot-h); max-width: 100%; }
-.doodle-slot > svg, .doodle-slot > picture, .doodle-slot img { display: block; width: 100%; height: 100%; }
+/* Doodles: the shared recipe.
+ *
+ * Every doodle sits in a fixed-size .doodle-slot (see src/doodles.ts) and is either
+ * her image file or an inline SVG stand-in. The stand-ins are pen lines drawn three
+ * times ("frames"); we show one frame at a time, a few times a second, so the line
+ * shivers like a flipbook ("line boil"). Movement (sway, steam, hover reactions) is a
+ * separate animation on a wrapper <g>, so a part can move and boil at the same time.
+ *
+ * Tuning knobs, in one place:
+ *   --boil-fps  how many times a second the lines are redrawn (6-8 feels hand-made;
+ *               2 is sleepy, 12 is nervous)
+ *   --motion    0..1, how far things move: sway angle, steam rise, hover reactions,
+ *               and how fast the rolling pin rolls. 0 = only the boil remains.
+ *
+ * Reduced motion: the base state below IS the still frame. Every animation lives
+ * inside @media (prefers-reduced-motion: no-preference). Hover reactions are further
+ * gated by @media (hover: hover); :focus-visible reactions work everywhere.
+ */
+
+:root {
+  --boil-fps: 7;
+  --motion: 1;
+}
+
+.doodle-slot {
+  display: inline-block;
+  width: var(--slot-w);
+  height: var(--slot-h);
+  max-width: 100%;
+  vertical-align: middle;
+  line-height: 0;
+  /* Per-slot boil speed relative to --boil-fps (the menu items run slower). */
+  --boil-rate: 1;
+}
+
+.doodle-slot > svg,
+.doodle-slot > picture,
+.doodle-slot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.doodle-slot > svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The little item doodles repeat down the page: boil them at ~60% speed so twenty of
+ * them do not turn the menu into a shiver. */
+.doodle-slot[data-doodle^='item-'] {
+  --boil-rate: 0.6;
+}
+
+/* ---- Line boil -------------------------------------------------------------- */
+
+/* Base state = still frame: frame 1 only. (opacity rather than visibility: a child set
+ * to visibility: visible would show through a hidden ancestor; opacity cannot.) */
+.doodle-slot .frame {
+  opacity: 0;
+}
+.doodle-slot .frame[data-frame='1'] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .doodle-slot .frame {
+    /* One full cycle shows all three frames, so the period is 3 / fps. */
+    --boil-period: calc(3s / (var(--boil-fps) * var(--boil-rate)));
+    animation: doodle-boil var(--boil-period) steps(1, end) infinite;
+  }
+  /* Negative delays stagger the frames so exactly one is visible per step, in order 1, 2, 3. */
+  .doodle-slot .frame[data-frame='2'] {
+    animation-delay: calc(var(--boil-period) / -3 * 2);
+  }
+  .doodle-slot .frame[data-frame='3'] {
+    animation-delay: calc(var(--boil-period) / -3);
+  }
+
+  @keyframes doodle-boil {
+    0% {
+      opacity: 1;
+    }
+    33.333% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}

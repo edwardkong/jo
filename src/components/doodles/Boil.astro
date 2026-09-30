@@ -1,0 +1,38 @@
+---
+// One "part" of a doodle, drawn three times with line boil.
+//
+// Renders <g class="frame" data-frame="1|2|3"> groups; src/styles/doodles.css shows one
+// at a time. Put a <Boil> inside any <g> you want to move (a steam wisp, a crumb) so the
+// movement and the boil stay independent. Anything passed as children is repeated in
+// every frame unchanged (used for the sign's text).
+import { frames } from '../../lib/wobble';
+
+/** A path: plain `d`, or `d` with a thicker/thinner stroke or a solid fill (the nail head). */
+export type BoilPath = string | { d: string; width?: number; fill?: boolean };
+
+interface Props {
+  paths: BoilPath[];
+  /** Max jitter per coordinate, in viewBox units (= CSS px at 1x). */
+  amount?: number;
+  /** Number of frames; the CSS recipe assumes 3. */
+  n?: number;
+}
+const { paths, amount = 0.6, n = 3 } = Astro.props;
+
+const normalised = paths.map((p) => (typeof p === 'string' ? { d: p } : p));
+// perPath[j][i] = frame i of path j; regroup so each frame lists every path.
+const perPath = normalised.map((p) => frames(p.d, n, amount));
+const frameList = Array.from({ length: n }, (_, i) =>
+  normalised.map((p, j) => ({ ...p, d: perPath[j][i] })),
+);
+---
+{
+  frameList.map((framePaths, i) => (
+    <g class="frame" data-frame={i + 1}>
+      {framePaths.map((p) => (
+        <path d={p.d} stroke-width={p.width} fill={p.fill ? 'currentColor' : undefined} />
+      ))}
+      <slot />
+    </g>
+  ))
+}
