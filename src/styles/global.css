@@ -1,0 +1,3 @@
+/* STUB — replaced by the layout build agent. */
+:root { --paper: #f6efe4; --ink: #2b2118; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body, Georgia, serif); }

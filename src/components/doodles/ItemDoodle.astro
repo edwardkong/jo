@@ -1,0 +1,7 @@
+---
+// STUB — replaced by the doodle build agent.
+import DoodleSlot from './DoodleSlot.astro';
+interface Props { kind: 'whisk' | 'crumb' | 'star' }
+const { kind } = Astro.props;
+---
+<DoodleSlot name={`item-${kind}`}><svg viewBox="0 0 10 10" aria-hidden="true"></svg></DoodleSlot>

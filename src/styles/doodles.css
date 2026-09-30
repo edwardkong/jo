@@ -1,0 +1,3 @@
+/* STUB — replaced by the doodle build agent. */
+.doodle-slot { display: inline-block; width: var(--slot-w); height: var(--slot-h); max-width: 100%; }
+.doodle-slot > svg, .doodle-slot > picture, .doodle-slot img { display: block; width: 100%; height: 100%; }

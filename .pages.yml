@@ -1,0 +1,22 @@
+# Pages CMS configuration (https://pagescms.org/docs/configuration).
+# FIRST DRAFT — the content build agent finalizes this file.
+media:
+  - name: photos
+    label: Photos
+    input: src/assets/uploads
+    output: /src/assets/uploads
+    extensions: [jpg, jpeg, png, webp, gif]
+    rename: safe
+
+content:
+  - name: posts
+    label: Menu items
+    type: collection
+    path: src/content/posts
+    filename: "{year}-{month}-{day}-{primary}.md"
+    fields:
+      - name: title
+        type: string
+        required: true
+      - name: body
+        type: rich-text

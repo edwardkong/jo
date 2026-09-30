@@ -1,0 +1,31 @@
+---
+// Fixed-size slot for one doodle. Renders her image file if one is configured in
+// src/doodles.ts, otherwise the inline SVG stand-in passed as a child.
+import { doodleSlots, doodleFiles, type DoodleName } from '../../doodles';
+import { withBase } from '../../lib/url';
+
+interface Props {
+  name: DoodleName;
+  /** Empty string = decorative (hidden from screen readers). */
+  alt?: string;
+  class?: string;
+}
+const { name, alt = '', class: className = '' } = Astro.props;
+const spec = doodleSlots[name];
+const file = doodleFiles[name];
+const still = file ? file.replace(/(\.[a-z0-9]+)$/i, '-still.png') : undefined;
+---
+<span
+  class:list={['doodle-slot', className]}
+  data-doodle={name}
+  style={`--slot-w:${spec.width}px;--slot-h:${spec.height}px`}
+>
+  {file ? (
+    <picture>
+      <source srcset={withBase(`doodles/${file}`)} media="(prefers-reduced-motion: no-preference)" />
+      <img src={withBase(`doodles/${still}`)} width={spec.width} height={spec.height} alt={alt} decoding="async" />
+    </picture>
+  ) : (
+    <slot />
+  )}
+</span>
