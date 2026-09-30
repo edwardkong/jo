@@ -2,7 +2,6 @@
 // The sketchbook: every doodle slot at 1x in a dashed box, for judging the motion and
 // for knowing what size to draw at. Plain on purpose. Not linked from the menu.
 import Base from '../layouts/Base.astro';
-import { Font } from 'astro:assets';
 import { doodleSlots, type DoodleName } from '../doodles';
 import SteamCup from '../components/doodles/SteamCup.astro';
 import HangingSign from '../components/doodles/HangingSign.astro';
@@ -34,7 +33,6 @@ const cards: Array<{ name: DoodleName; label: string }> = [
 ---
 <Base title="sketchbook" description="the doodle slots, at size, for judging the motion">
   {/* The sign's text needs the handwritten face; harmless if the layout loads it too. */}
-  <Font cssVariable="--font-hand" />
 
   <main class="sketchbook">
     <h1>sketchbook</h1>
