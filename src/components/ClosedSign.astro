@@ -1,0 +1,50 @@
+---
+// The "kitchen's closed" sign hanging below the last shelf.
+// A link when she has given it somewhere to point; otherwise just a sign.
+import HangingSign from './doodles/HangingSign.astro';
+import { withBase } from '../lib/url';
+
+interface Props {
+  text: string;
+  /** Site-relative path or full URL. Empty = not a link. */
+  href?: string;
+}
+const { text, href = '' } = Astro.props;
+const isExternal = /^https?:\/\//i.test(href);
+const url = href ? (isExternal ? href : withBase(href)) : '';
+---
+
+<div class="sign-wall wrap">
+  {url ? (
+    <a class="closed-sign" href={url} aria-label={text}>
+      <HangingSign text={text} />
+    </a>
+  ) : (
+    <span class="closed-sign" tabindex="0" role="img" aria-label={text}>
+      <HangingSign text={text} />
+    </span>
+  )}
+</div>
+
+<style>
+  /* Centred, with wall space around it so the sign can swing. */
+  .sign-wall {
+    display: flex;
+    justify-content: center;
+    margin-top: 3.5rem;
+    padding-top: 0.5rem;
+  }
+
+  .closed-sign {
+    display: inline-block;
+    line-height: 0;
+    text-decoration: none;
+    color: inherit;
+    /* the nail is at the top of the sign; swing from there */
+    transform-origin: 50% 4px;
+  }
+
+  .closed-sign:focus-visible {
+    outline-offset: 8px;
+  }
+</style>

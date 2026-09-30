@@ -1,5 +1,41 @@
 ---
-// STUB — replaced by the layout build agent.
+// Nothing at this address.
 import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/url';
 ---
-<Base title="not on the menu"><p>we're out of that.</p></Base>
+
+<Base title="not on the menu" description="we're out of that.">
+  <section class="gone wrap">
+    <h1 class="gone__title">we're out of that.</h1>
+    <p class="gone__note">
+      whatever you were after isn't on the menu today. maybe it sold out; maybe it was never
+      on the shelf. the rest is still there.
+    </p>
+    <p class="gone__back">
+      <a class="back-link" href={withBase('')}>← back to the menu</a>
+    </p>
+  </section>
+</Base>
+
+<style>
+  .gone {
+    padding-top: 3rem;
+    max-width: 30rem;
+  }
+
+  .gone__title {
+    font-size: clamp(2.4rem, 1.6rem + 5vw, 3.6rem);
+    transform: rotate(-1deg);
+    transform-origin: left bottom;
+  }
+
+  .gone__note {
+    margin-top: 1rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .gone__back {
+    margin-top: 1.75rem;
+  }
+</style>

@@ -48,7 +48,11 @@ export default defineConfig({
   fonts: [
     {
       // Handwritten face for the menu: names, headings, the sign.
-      provider: fontProviders.google(),
+      // Fontsource rather than Google: Gaegu is a Korean face and Google serves it as
+      // ~90 numbered slices per weight that the `subsets` filter can't drop (178 files,
+      // 178 preload tags). Fontsource ships one latin file per weight. Downloaded at
+      // build time and self-hosted like the rest; nothing is fetched at runtime.
+      provider: fontProviders.fontsource(),
       name: 'Gaegu',
       cssVariable: '--font-hand',
       weights: [400, 700],

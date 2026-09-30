@@ -1,12 +1,139 @@
 ---
-// STUB — replaced by the layout build agent.
-import Base from '../../layouts/Base.astro';
+// One post. The URL is /menu/<post id>/; drafts never get a page.
 import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import CommentsSlot from '../../components/CommentsSlot.astro';
+import FooterDoodle from '../../components/doodles/FooterDoodle.astro';
+import { getPublishedPosts, UNSORTED, type Post } from '../../lib/menu';
+import { withBase } from '../../lib/url';
+
 export async function getStaticPaths() {
-  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  const posts = await getPublishedPosts();
   return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+interface Props {
+  post: Post;
 }
 const { post } = Astro.props;
 const { Content } = await render(post);
+
+// "From the oven", looked up from the section files; the raw id if the file is gone.
+const sections = await getCollection('sections');
+const sectionTitle =
+  sections.find((s) => s.id === post.data.section)?.data.title ?? (post.data.section || UNSORTED.title);
+
+/** "12 September 2026". Dates are plain days, so read them in UTC. */
+function longDate(d: Date): string {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+  return `${d.getUTCDate()} ${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
+
+const date = post.data.date;
+const cover = post.data.cover;
 ---
-<Base title={post.data.title}><h1>{post.data.title}</h1><Content /></Base>
+
+<Base title={post.data.title} description={post.data.description}>
+  <article class="post">
+    <p class="post__back wrap">
+      <a class="back-link" href={withBase('')}>← back to the menu</a>
+    </p>
+
+    <header class="post__head wrap">
+      <h1 class="post__title">{post.data.title}</h1>
+      <p class="post__meta">
+        <span>{sectionTitle}</span>
+        {' · '}
+        <time datetime={date.toISOString().slice(0, 10)}>{longDate(date)}</time>
+      </p>
+    </header>
+
+    {cover && (
+      <figure class="post__cover wrap">
+        <Image
+          src={cover}
+          alt=""
+          width={1200}
+          widths={[390, 640, 780, 1200]}
+          sizes="(min-width: 44rem) 40rem, calc(100vw - 2.5rem)"
+          layout="constrained"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </figure>
+    )}
+
+    <div class="prose wrap">
+      <Content />
+    </div>
+  </article>
+
+  <CommentsSlot />
+
+  <div class="post__crumbs wrap" aria-hidden="true">
+    <FooterDoodle />
+  </div>
+</Base>
+
+<style>
+  .post__back {
+    padding-top: 0.25rem;
+  }
+
+  .post__head {
+    margin-top: 1.5rem;
+  }
+
+  .post__title {
+    font-size: clamp(2.2rem, 1.5rem + 4vw, 3.4rem);
+    line-height: 1;
+    transform: rotate(-0.6deg);
+    transform-origin: left bottom;
+  }
+
+  .post__meta {
+    margin-top: 0.7rem;
+    font-family: var(--hand);
+    font-size: 1.2rem;
+    color: var(--ink-soft);
+  }
+
+  /* The cover photo, stuck in like a print: white border, a hair of tilt. */
+  .post__cover {
+    margin: 1.75rem auto 0;
+  }
+
+  .post__cover :global(img) {
+    width: 100%;
+    height: auto;
+    padding: 6px;
+    background: var(--white);
+    border: 1px solid var(--paper-deep);
+    box-shadow: 0 1px 3px rgba(44, 34, 25, 0.14);
+    transform: rotate(-0.7deg);
+  }
+
+  .prose {
+    margin-top: 1.9rem;
+  }
+
+  .post__crumbs {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+    line-height: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .post__head {
+      margin-top: 2rem;
+    }
+    .prose {
+      margin-top: 2.4rem;
+    }
+  }
+</style>
