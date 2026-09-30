@@ -1,0 +1,72 @@
+---
+// Homepage header: the bakery name, a cup of something steaming beside it,
+// and the intro line underneath.
+import SteamCup from './doodles/SteamCup.astro';
+
+interface Props {
+  name: string;
+  intro?: string;
+}
+const { name, intro = '' } = Astro.props;
+---
+
+<header class="site-head wrap">
+  <div class="site-head__row">
+    <h1 class="site-head__name">{name}</h1>
+    <div class="site-head__cup"><SteamCup /></div>
+  </div>
+  {intro && <p class="site-head__intro">{intro}</p>}
+</header>
+
+<style>
+  .site-head {
+    padding-top: 0.5rem;
+  }
+
+  /* Name on the left, cup on the right, both sitting on the same baseline-ish
+     line. The name wraps on narrow screens; the cup never shrinks, so there is
+     never a hole beside it. */
+  .site-head__row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+
+  .site-head__name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: var(--text-h1);
+    line-height: 0.92;
+    letter-spacing: 0.01em;
+    /* a hair of tilt, like it was lettered by hand */
+    transform: rotate(-1.2deg);
+    transform-origin: left bottom;
+    padding-bottom: 0.4rem;
+  }
+
+  .site-head__cup {
+    flex: 0 0 auto;
+    line-height: 0;
+    /* tuck the cup's saucer a touch below the name's baseline */
+    margin-bottom: -0.35rem;
+  }
+
+  .site-head__intro {
+    margin-top: 0.6rem;
+    max-width: 30rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  @media (min-width: 40rem) {
+    .site-head {
+      padding-top: 1.5rem;
+    }
+    .site-head__intro {
+      margin-top: 0.9rem;
+      font-size: 1.125rem;
+    }
+  }
+</style>

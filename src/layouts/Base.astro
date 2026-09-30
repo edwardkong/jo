@@ -1,18 +1,53 @@
 ---
-// STUB — replaced by the layout build agent.
+// The one page shell. Head, skip link, <main>, footer line.
+// Every page (menu, post, 404) renders inside this.
+import { Font } from 'astro:assets';
 import '../styles/global.css';
 import '../styles/doodles.css';
-interface Props { title: string; description?: string }
-const { title, description = '' } = Astro.props;
+import SiteFooter from '../components/SiteFooter.astro';
+import { getSite } from '../lib/site';
+import { withBase } from '../lib/url';
+
+interface Props {
+  /** Page title; the site name is appended ("menu · Small Hours"). */
+  title: string;
+  description?: string;
+}
+
+const site = getSite();
+const { title, description = site.intro } = Astro.props;
+const fullTitle = `${title} · ${site.name}`;
 ---
+
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex" />
-    <title>{title}</title>
+    <meta name="generator" content={Astro.generator} />
+    <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
+    {site.noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#f3ead9" />
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+    {/* Self-hosted fonts (see astro.config.mjs). Preload the faces used above the fold. */}
+    <Font cssVariable="--font-hand" preload />
+    <Font cssVariable="--font-body" preload={[{ style: 'normal' }]} />
   </head>
-  <body><slot /></body>
+  <body>
+    <a class="skip-link" href="#main">skip to the menu</a>
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter text={site.footer} />
+  </body>
 </html>
+
+<style>
+  main {
+    padding-block: 1.5rem 3rem;
+  }
+  main:focus {
+    outline: none;
+  }
+</style>

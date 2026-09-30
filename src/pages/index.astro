@@ -1,10 +1,39 @@
 ---
-// STUB — replaced by the layout build agent.
+// The menu. Header, one shelf per section, the closed sign, footer.
 import Base from '../layouts/Base.astro';
-import { getCollection } from 'astro:content';
-import { withBase } from '../lib/url';
-const posts = await getCollection('posts', ({ data }) => !data.draft);
+import SiteHeader from '../components/SiteHeader.astro';
+import MenuSection from '../components/MenuSection.astro';
+import ClosedSign from '../components/ClosedSign.astro';
+import { getMenu } from '../lib/menu';
+import { getSite } from '../lib/site';
+
+const site = getSite();
+const menu = await getMenu();
+
+// Running count of items before each section, so the little doodles keep
+// rotating whisk / crumb / star all the way down the page.
+let seen = 0;
+const shelves = menu.map((section) => {
+  const startIndex = seen;
+  seen += section.posts.length;
+  return { section, startIndex };
+});
 ---
-<Base title="menu">
-  <ul>{posts.map((p) => <li><a href={withBase(`menu/${p.id}/`)}>{p.data.title}</a> — {p.data.section}</li>)}</ul>
+
+<Base title="menu" description={site.intro}>
+  <SiteHeader name={site.name} intro={site.intro} />
+
+  <div class="menu">
+    {shelves.map(({ section, startIndex }) => (
+      <MenuSection section={section} startIndex={startIndex} />
+    ))}
+  </div>
+
+  <ClosedSign text={site.sign_text} href={site.sign_link} />
 </Base>
+
+<style>
+  .menu {
+    margin-top: 1rem;
+  }
+</style>

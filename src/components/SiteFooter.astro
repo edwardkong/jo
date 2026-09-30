@@ -1,0 +1,23 @@
+---
+// The last line on every page, small and handwritten.
+interface Props {
+  text?: string;
+}
+const { text = '' } = Astro.props;
+---
+
+{text && (
+  <footer class="site-footer wrap">
+    <p>{text}</p>
+  </footer>
+)}
+
+<style>
+  .site-footer {
+    padding-block: 1rem 2.5rem;
+    text-align: center;
+    font-family: var(--hand);
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+  }
+</style>

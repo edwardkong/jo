@@ -1,0 +1,83 @@
+---
+// One shelf of the menu: a section title, its blurb, and the posts filed under it.
+import type { MenuSection as Section } from '../lib/menu';
+import MenuItem from './MenuItem.astro';
+
+interface Props {
+  section: Section;
+  /** Running item count from earlier sections, so doodles keep rotating across the page. */
+  startIndex?: number;
+}
+const { section, startIndex = 0 } = Astro.props;
+const headingId = `section-${section.id}`;
+---
+
+<section class="menu-section wrap" aria-labelledby={headingId}>
+  <header class="menu-section__head">
+    <h2 class="menu-section__title" id={headingId}>{section.title}</h2>
+    {section.blurb && <p class="menu-section__blurb">{section.blurb}</p>}
+  </header>
+
+  {section.posts.length > 0 ? (
+    <ul class="menu-section__list" role="list">
+      {section.posts.map((post, i) => (
+        <li>
+          <MenuItem post={post} index={startIndex + i} />
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="menu-section__empty">nothing on this shelf yet — still proving.</p>
+  )}
+</section>
+
+<style>
+  .menu-section {
+    margin-top: 2.75rem;
+  }
+
+  .menu-section__head {
+    margin-bottom: 0.9rem;
+  }
+
+  /* Section titles sit on a hand-drawn wavy rule and lean a little. */
+  .menu-section__title {
+    display: inline-block;
+    font-size: var(--text-h2);
+    padding: 0 0.15em 0.35rem;
+    background: var(--wave-soft) repeat-x left bottom / 120px 8px;
+    transform: rotate(-0.8deg);
+    transform-origin: left bottom;
+  }
+
+  .menu-section__blurb {
+    margin-top: 0.35rem;
+    font-size: var(--text-sm);
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .menu-section__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .menu-section__list > li + li {
+    margin-top: 0.35rem;
+  }
+
+  .menu-section__empty {
+    /* lines up with the item names (doodle column + gap) */
+    margin: 0.5rem 0 0 calc(40px + 0.65rem);
+    font-family: var(--hand);
+    font-size: 1.25rem;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 40rem) {
+    .menu-section {
+      margin-top: 3.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+// PLACEHOLDER for the anonymous comment section.
+// Nothing here works yet on purpose. When a comment widget is chosen, replace the
+// inside of this component (or the whole file) and nothing else needs to change:
+// the post page just renders <CommentsSlot />.
+---
+
+<aside class="order-slip wrap" aria-labelledby="order-slip-title">
+  <p class="order-slip__label" id="order-slip-title">order slip</p>
+  <p class="order-slip__note">a place to leave a note for the kitchen — coming soon</p>
+  <p class="order-slip__lines" aria-hidden="true"></p>
+</aside>
+
+<style>
+  /* A dashed ticket, slightly askew, so it is obviously a stand-in. */
+  .order-slip {
+    margin-top: 3.5rem;
+    padding: 1rem 1.1rem 1.2rem;
+    border: 2px dashed var(--ink-soft);
+    border-radius: 4px;
+    background: rgba(255, 253, 248, 0.5);
+    transform: rotate(-0.5deg);
+    max-width: 24rem;
+  }
+
+  .order-slip__label {
+    font-family: var(--hand);
+    font-size: 1rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .order-slip__note {
+    margin-top: 0.35rem;
+    font-family: var(--hand);
+    font-size: 1.35rem;
+    line-height: 1.2;
+  }
+
+  /* three faint ruled lines, where the note would be written */
+  .order-slip__lines {
+    height: 4.2rem;
+    margin-top: 0.9rem;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 1.3rem,
+      var(--paper-deep) 1.3rem calc(1.3rem + 1px)
+    );
+  }
+</style>

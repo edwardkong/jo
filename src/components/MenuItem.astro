@@ -1,0 +1,197 @@
+---
+// One line of the menu = one post. The whole card is the link.
+//   [doodle]  Name of the thing ............ 12 sep   [thumb]
+//             one-line description
+import { Image } from 'astro:assets';
+import type { Post } from '../lib/menu';
+import { withBase } from '../lib/url';
+import ItemDoodle from './doodles/ItemDoodle.astro';
+
+interface Props {
+  post: Post;
+  /** Position on the page; picks which little doodle sits beside the name. */
+  index: number;
+}
+const { post, index } = Astro.props;
+
+const DOODLES = ['whisk', 'crumb', 'star'] as const;
+const doodle = DOODLES[index % DOODLES.length];
+
+/** "12 sep" — where a price would go. Dates are stored as plain days, so read them in UTC. */
+function shortDate(d: Date): string {
+  const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  return `${d.getUTCDate()} ${months[d.getUTCMonth()]}`;
+}
+
+const href = withBase(`menu/${post.id}/`);
+const date = post.data.date;
+const cover = post.data.cover;
+---
+
+<a class="menu-item" href={href}>
+  <span class="menu-item__doodle" aria-hidden="true"><ItemDoodle kind={doodle} /></span>
+
+  <span class="menu-item__main">
+    <span class="menu-item__line">
+      <span class="menu-item__name">{post.data.title}</span>
+      <span class="menu-item__leader" aria-hidden="true"></span>
+      <time class="menu-item__date" datetime={date.toISOString().slice(0, 10)}>{shortDate(date)}</time>
+    </span>
+    {post.data.description && <span class="menu-item__desc">{post.data.description}</span>}
+  </span>
+
+  {cover && (
+    <span class="menu-item__thumb">
+      <Image src={cover} alt="" width={68} height={68} layout="fixed" fit="cover" loading="lazy" />
+    </span>
+  )}
+</a>
+
+<style>
+  /* Phones: the name line gets the full width (so long names don't crumble
+     word by word) and the thumbnail sits beside the description.
+       [doodle] Name ............... 12 sep
+                description         [thumb]
+     Wider screens: the thumbnail spans both rows on the right. */
+  .menu-item {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'doodle line line'
+      'doodle desc thumb';
+    align-items: start;
+    column-gap: 0.65rem;
+    padding: 0.55rem 0.25rem 0.6rem 0;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .menu-item__doodle {
+    grid-area: doodle;
+    line-height: 0;
+    /* nudge the 40px doodle so it sits level with the name, not the description */
+    margin-top: -0.2rem;
+  }
+
+  .menu-item__main {
+    display: contents;
+  }
+
+  /* Name, dotted leader, date — all on one baseline like a printed menu.
+     If the name wraps, the leader follows its last line. */
+  .menu-item__line {
+    grid-area: line;
+    display: flex;
+    align-items: last baseline;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .menu-item__name {
+    flex: 0 1 auto;
+    font-family: var(--hand);
+    /* a touch smaller on phones, where the name shares its line with the date */
+    font-size: calc(var(--text-name) - 0.1rem);
+    font-weight: 700;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+    /* the pencil underline drawn on hover, from the left */
+    background: var(--wave-accent) no-repeat left bottom / 0% 0.42em;
+    padding-bottom: 0.1em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .menu-item__leader {
+    flex: 1 0 1rem;
+    height: 0;
+    border-bottom: 2px dotted var(--ink-soft);
+    opacity: 0.55;
+    /* lift the dots off the baseline a touch */
+    transform: translateY(-0.35em);
+  }
+
+  .menu-item__date {
+    flex: 0 0 auto;
+    font-family: var(--hand);
+    font-size: 1.2rem;
+    line-height: 1;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .menu-item__desc {
+    grid-area: desc;
+    display: block;
+    margin-top: 0.2rem;
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+
+  /* Cover thumbnail: a small photo with a paper border, slightly askew. */
+  .menu-item__thumb {
+    grid-area: thumb;
+    display: block;
+    margin-top: 0.25rem;
+    line-height: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .menu-item {
+      grid-template-areas:
+        'doodle line thumb'
+        'doodle desc thumb';
+    }
+    .menu-item__name {
+      font-size: var(--text-name);
+    }
+    .menu-item__thumb {
+      margin-top: -0.1rem;
+    }
+  }
+
+  .menu-item__thumb :global(img) {
+    width: 68px;
+    height: 68px;
+    object-fit: cover;
+    padding: 3px;
+    background: var(--white);
+    border: 1px solid var(--paper-deep);
+    box-shadow: 0 1px 2px rgba(44, 34, 25, 0.12);
+    transform: rotate(1.6deg);
+  }
+
+  /* Hover / keyboard focus: the underline gets pencilled in and the date
+     turns red-pencil. No box, no shadow — it's a menu, not a button grid. */
+  .menu-item:hover .menu-item__name,
+  .menu-item:focus-visible .menu-item__name {
+    background-size: 100% 0.42em;
+  }
+
+  .menu-item:hover .menu-item__date,
+  .menu-item:focus-visible .menu-item__date {
+    color: var(--accent);
+  }
+
+  .menu-item:hover .menu-item__thumb :global(img),
+  .menu-item:focus-visible .menu-item__thumb :global(img) {
+    transform: rotate(-1deg);
+  }
+
+  .menu-item:focus-visible {
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .menu-item__name {
+      transition: background-size 0.28s ease-out;
+    }
+    .menu-item__date {
+      transition: color 0.2s;
+    }
+    .menu-item__thumb :global(img) {
+      transition: transform 0.25s ease;
+    }
+  }
+</style>
