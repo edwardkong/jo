@@ -1,22 +1,202 @@
-# Pages CMS configuration (https://pagescms.org/docs/configuration).
-# FIRST DRAFT — the content build agent finalizes this file.
+# Pages CMS configuration  -  https://pagescms.org/docs/configuration
+#
+# This file tells Pages CMS (the phone-friendly editor at app.pagescms.org) what can be
+# edited in this repo and how each field is saved. Every key below was checked against
+# the Pages CMS 2.1.8 docs and its config validator (lib/config-schema.ts in the
+# pages-cms repo); comments say where the docs are thin. Indentation matters: two
+# spaces, never tabs. She never needs to open this file; the owner might.
+
+# ----------------------------------------------------------------------------------------
+# Photos
+#
+# "input" is the folder in the repo where uploads land; "output" is the path written into
+# a post. They are the same here on purpose: Astro only optimises images it can import,
+# and astro.config.mjs turns "/src/assets/uploads/x.jpg" back into an import at build time.
 media:
   - name: photos
     label: Photos
     input: src/assets/uploads
     output: /src/assets/uploads
+    # Lowercase only. The CMS compares extensions case-sensitively when listing the
+    # folder, so a "PHOTO.JPG" copied in by hand will not show in the picker. Uploads made
+    # through the CMS are fine: "rename: safe" slugifies the name and lowercases the
+    # extension. HEIC is left out because Astro's image tool cannot read it; iPhones send
+    # JPEG when the browser asks for one.
     extensions: [jpg, jpeg, png, webp, gif]
+    # false = keep the original name, safe = slugify it, random = generated name.
     rename: safe
 
 content:
+  # --------------------------------------------------------------------------------------
+  # Menu items (the posts). One Markdown file each: frontmatter on top, the writing below.
+  # The "body" field is special in Pages CMS: it maps to the text under the frontmatter.
   - name: posts
     label: Menu items
+    description: Each menu item is a post. Tap one to write.
     type: collection
     path: src/content/posts
+    # format is inferred from the .md extension (yaml-frontmatter); left implicit.
+    #
+    # New files are named from the day they are created plus the slugified title, e.g.
+    # "2026-09-12-lemon-loaf-second-attempt.md". {primary} is the view.primary field
+    # (title) run through slugify(lower, strict). The date in the file name is the
+    # creation day, not the "date" field: the site sorts by the field and drops the
+    # prefix from the URL, so the two drifting apart is harmless.
     filename: "{year}-{month}-{day}-{primary}.md"
+    view:
+      primary: title
+      fields: [title, section, date, draft]
+      sort: [date, title]
+      search: [title, description]
+      default:
+        sort: date
+        order: desc
     fields:
       - name: title
+        label: Name
         type: string
         required: true
+        description: "What it is called on the menu. It also becomes the web address, so two posts with the same name will fight over it."
+      - name: description
+        label: One line
+        type: string
+        description: "One line, like a menu. Something like: dense on purpose, I think."
+      - name: section
+        label: Section
+        type: reference
+        required: true
+        description: "Which part of the menu it sits under."
+        options:
+          collection: sections
+          # What gets stored. The site keys sections by file name, so it wants
+          # "bakes.yml", which is exactly what {name} gives (the referenced entry's file
+          # name, extension included; verified in the references API). The default,
+          # {path}, would store "src/content/sections/bakes.yml"; the site tolerates that
+          # too, but the short form is what everything else expects.
+          value: "{name}"
+          # What the dropdown shows: the section's heading, not the file name.
+          # {primary} is the referenced collection's view.primary (title).
+          label: "{primary}"
+          # Comma-separated. "primary" and "name" are handled as special tokens.
+          search: "primary,name"
+      - name: date
+        label: Date
+        type: date
+        description: "Newer sits higher on the menu. Starts as today."
+        # No "default" on purpose: a date field starts as the current local date unless
+        # default: "" is set (docs: Date field, Notes). Saved as yyyy-MM-dd, which is also
+        # what the field uses when "format" is omitted; spelled out here so it is visible.
+        options:
+          format: yyyy-MM-dd
+      - name: cover
+        label: Cover photo
+        type: image
+        description: "Optional. Shows on the menu and at the top of the post. Keep it under about 3 MB."
+        # No "required": an empty cover is fine, the site treats "" and missing the same.
+        options:
+          media: photos
+      - name: draft
+        label: Still in the oven (hidden from the menu)
+        type: boolean
+        default: true
+        description: "On for new posts. Switch it off when it is ready to be seen."
       - name: body
+        label: The writing
         type: rich-text
+        description: "Headings, lists, quotes and photos all work. Photos go next to the cover in the same folder."
+        options:
+          # markdown is the default; stated so nobody switches it to html by accident.
+          format: markdown
+          media: photos
+          # switcher (Editor/Source toggle) is left at its default, true.
+
+  # --------------------------------------------------------------------------------------
+  # Menu sections: the headings on the menu. Posts point at these by file name, so the
+  # file name is the stable id and the heading can change freely.
+  - name: sections
+    label: Menu sections
+    description: The headings on the menu. Every menu item sits under one.
+    type: collection
+    path: src/content/sections
+    # Plain YAML files, no frontmatter. The site reads *.yml only, so the .yml here matters.
+    format: yaml
+    filename: "{primary}.yml"
+    view:
+      primary: title
+      fields: [title, order]
+      sort: [order, title]
+      default:
+        sort: order
+        order: asc
+    fields:
+      - name: title
+        label: Heading
+        type: string
+        required: true
+        description: "As it appears on the menu. Changing the heading is fine; renaming the file is not, because posts point at the file name."
+      - name: blurb
+        label: Small print
+        type: text
+        description: "A line under the heading. Optional."
+      - name: order
+        label: Order
+        type: number
+        default: 10
+        description: "Lower comes first."
+        options:
+          min: 0
+
+  # --------------------------------------------------------------------------------------
+  # Site settings: one JSON file with the name over the door, the sign, the footer.
+  - name: site
+    label: Site settings
+    description: The name over the door, the little sign, the footer.
+    type: file
+    path: src/data/site.json
+    format: json
+    fields:
+      - name: name
+        label: Name of the place
+        type: string
+        required: true
+        description: "Goes over the door and in the browser tab."
+      - name: intro
+        label: Intro
+        type: text
+        description: "A sentence or two under the name."
+      - name: sign_text
+        label: Sign text
+        type: string
+        description: "What the little hanging sign says."
+      - name: sign_link
+        label: Sign link
+        type: string
+        description: "Where the sign goes when tapped. Leave empty and it goes nowhere."
+      - name: footer
+        label: Footer
+        type: string
+        description: "The last line on every page."
+      - name: noindex
+        label: Keep search engines away
+        type: boolean
+        default: true
+        description: "On while this is a prototype. Off if you ever want to be found."
+
+# ----------------------------------------------------------------------------------------
+# Repository-wide behaviour. The validator only allows: config, cache, hide,
+# content.merge, commit.templates, commit.identity.
+settings:
+  commit:
+    # "user" puts her name and email on the commit (she is invited as a collaborator by
+    # email, no GitHub account needed). The default, "app", would show the Pages CMS app
+    # as the committer instead. Note: the docs say "when available"; an email-only
+    # collaborator may have no display name, in which case GitHub shows the email.
+    identity: user
+    # Tokens: {action} {path} {filename} {name} {owner} {repo} {branch} {userName}
+    # {userEmail} {oldPath} {newPath} {oldFilename} {newFilename}. {name} is the content
+    # or media entry name above ("posts", "sections", "site", "photos").
+    templates:
+      create: "Add {filename} to {name} (via Pages CMS)"
+      update: "Edit {filename} in {name} (via Pages CMS)"
+      delete: "Remove {filename} from {name} (via Pages CMS)"
+      rename: "Rename {oldFilename} to {newFilename} in {name} (via Pages CMS)"
