@@ -1,0 +1,221 @@
+---
+// The sketchbook: every doodle slot at 1x in a dashed box, for judging the motion and
+// for knowing what size to draw at. Plain on purpose. Not linked from the menu.
+import Base from '../layouts/Base.astro';
+import { Font } from 'astro:assets';
+import { doodleSlots, type DoodleName } from '../doodles';
+import SteamCup from '../components/doodles/SteamCup.astro';
+import HangingSign from '../components/doodles/HangingSign.astro';
+import ItemDoodle from '../components/doodles/ItemDoodle.astro';
+import FooterDoodle from '../components/doodles/FooterDoodle.astro';
+
+function size(name: DoodleName): { css: string; draw: string } {
+  const { width, height } = doodleSlots[name];
+  return { css: `${width} × ${height}`, draw: `${width * 2} × ${height * 2}` };
+}
+
+const hints: Record<DoodleName, string> = {
+  'header-steam': 'no hover reaction; the steam rises on its own',
+  'closed-sign': 'hover or focus it: swings wider',
+  'item-whisk': 'hover or focus the item: stirs',
+  'item-crumb': 'hover or focus the item: crumbs scatter',
+  'item-star': 'hover or focus the item: twinkles',
+  'footer-crumbs': 'no hover reaction; rolls by on its own',
+};
+
+const cards: Array<{ name: DoodleName; label: string }> = [
+  { name: 'header-steam', label: 'steam cup' },
+  { name: 'closed-sign', label: 'hanging sign' },
+  { name: 'item-whisk', label: 'whisk' },
+  { name: 'item-crumb', label: 'crumbs' },
+  { name: 'item-star', label: 'star' },
+  { name: 'footer-crumbs', label: 'rolling pin' },
+];
+---
+<Base title="sketchbook" description="the doodle slots, at size, for judging the motion">
+  {/* The sign's text needs the handwritten face; harmless if the layout loads it too. */}
+  <Font cssVariable="--font-hand" />
+
+  <main class="sketchbook">
+    <h1>sketchbook</h1>
+    <p class="lead">
+      Every drawing on the menu lives in a fixed box. These are the stand-ins, at the size
+      they appear on the page. Each is drawn three times and flipped between, so the line
+      shivers; the movements are small and stepped, like a flipbook. Draw yours at twice the
+      size shown (phones have sharp screens) and they drop straight in.
+    </p>
+
+    <section class="knobs" aria-label="tuning knobs">
+      <label>
+        <span>line boil <output id="boil-fps-value">7</output> fps</span>
+        <input type="range" min="1" max="12" step="1" value="7" data-knob="boil-fps" />
+      </label>
+      <label>
+        <span>motion <output id="motion-value">1</output></span>
+        <input type="range" min="0" max="1" step="0.05" value="1" data-knob="motion" />
+      </label>
+      <p class="knob-note">
+        These only change this page while it is open. To keep a setting, change{' '}
+        <code>--boil-fps</code> or <code>--motion</code> at the top of{' '}
+        <code>src/styles/doodles.css</code>. Line boil is how many times a second the lines
+        are redrawn; motion scales how far things move (0 = only the boil is left).
+      </p>
+    </section>
+
+    <ul class="cards">
+      {cards.map(({ name, label }) => {
+        const s = size(name);
+        return (
+          <li class="card">
+            <div class="box" style={`width:${doodleSlots[name].width}px;height:${doodleSlots[name].height}px`}>
+              {name === 'header-steam' && <SteamCup />}
+              {name === 'closed-sign' && (
+                <span class="closed-sign" tabindex="0"><HangingSign /></span>
+              )}
+              {name === 'item-whisk' && <a class="menu-item" href="#whisk"><ItemDoodle kind="whisk" /></a>}
+              {name === 'item-crumb' && <a class="menu-item" href="#crumb"><ItemDoodle kind="crumb" /></a>}
+              {name === 'item-star' && <a class="menu-item" href="#star"><ItemDoodle kind="star" /></a>}
+              {name === 'footer-crumbs' && <FooterDoodle />}
+            </div>
+            <dl>
+              <dt>{label}</dt>
+              <dd><code>{name}</code></dd>
+              <dd>{doodleSlots[name].where}</dd>
+              <dd>{s.css} css px · draw at {s.draw}</dd>
+              <dd class="hint">{hints[name]}</dd>
+            </dl>
+          </li>
+        );
+      })}
+    </ul>
+
+    <section class="notes">
+      <h2>notes</h2>
+      <p>
+        If your phone or computer is set to reduce motion, everything here holds still on
+        its first frame. That is on purpose: the same setting swaps your animated files for
+        their still versions.
+      </p>
+      <p>
+        Hover reactions only happen on devices with a mouse; on a phone, tapping a menu item
+        opens it. Keyboard focus triggers the same reactions everywhere.
+      </p>
+    </section>
+  </main>
+</Base>
+
+<script>
+  // The two knobs set the CSS custom properties on <html> so every doodle follows.
+  const root = document.documentElement;
+  for (const input of document.querySelectorAll<HTMLInputElement>('input[data-knob]')) {
+    const knob = input.dataset.knob;
+    const out = document.getElementById(`${knob}-value`);
+    input.addEventListener('input', () => {
+      root.style.setProperty(`--${knob}`, input.value);
+      if (out) out.textContent = input.value;
+    });
+  }
+</script>
+
+<style>
+  .sketchbook {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+    font-family: var(--font-body, Georgia, serif);
+    line-height: 1.5;
+  }
+  h1,
+  h2,
+  dt {
+    font-family: var(--font-hand, 'Comic Sans MS', cursive);
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+  }
+  h1 {
+    font-size: 2.2rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+  }
+  .lead,
+  .knob-note,
+  .notes p {
+    max-width: 38rem;
+  }
+  .knobs {
+    margin: 1.5rem 0 2rem;
+    padding: 1rem;
+    border: 1px dashed currentColor;
+    border-radius: 6px;
+  }
+  .knobs label {
+    display: grid;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+  }
+  .knobs input {
+    width: min(100%, 18rem);
+    accent-color: currentColor;
+  }
+  .knob-note {
+    font-size: 0.9em;
+    margin: 0.5rem 0 0;
+  }
+  code {
+    font-size: 0.9em;
+  }
+
+  .cards {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 2rem 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  }
+  .card {
+    display: grid;
+    gap: 0.75rem;
+  }
+  /* The dashed box is exactly the slot; the doodle should fill it edge to edge. */
+  .box {
+    box-sizing: content-box;
+    padding: 0.5rem;
+    border: 1px dashed currentColor;
+    border-radius: 4px;
+    opacity: 1;
+    max-width: 100%;
+  }
+  .box .menu-item,
+  .box .closed-sign {
+    display: inline-block;
+    line-height: 0;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+  .box .menu-item:focus-visible,
+  .box .closed-sign:focus-visible {
+    outline: 2px dashed currentColor;
+    outline-offset: 4px;
+  }
+  dl {
+    margin: 0;
+  }
+  dd {
+    margin: 0;
+    font-size: 0.95em;
+  }
+  dt {
+    font-size: 1.4rem;
+    margin-bottom: 0.1rem;
+  }
+  .hint {
+    font-style: italic;
+    opacity: 0.8;
+  }
+  .notes {
+    margin-top: 3rem;
+  }
+</style>

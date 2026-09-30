@@ -1,5 +1,179 @@
 ---
-// STUB — replaced by the doodle build agent.
+// The "kitchen's closed" sign: a nail that never moves, a string in a V, a wonky
+// board, and the text in the handwritten face. The hanging part sways +/-2 degrees on
+// a slow stepped loop, +/-6 degrees while an ancestor .closed-sign is hovered or
+// focused (the layout wraps the sign in <a class="closed-sign"> or
+// <span class="closed-sign" tabindex="0">). Meaningful: role="img" with a <title>.
+// Slot: closed-sign, 160 x 110 (draw at 320 x 220).
 import DoodleSlot from './DoodleSlot.astro';
+import Boil from './Boil.astro';
+
+interface Props {
+  text?: string;
+}
+const { text = "kitchen's closed" } = Astro.props;
+
+// The nail: transform-origin of the sway (see <style>). Keep in sync with NAIL below.
+const NAIL = { x: 80, y: 9 };
+
+const nail = [
+  'M 83,9 C 83,10.7 81.7,12 80,12 C 78.3,12 77,10.7 77,9 C 77,7.3 78.3,6 80,6 C 81.7,6 83,7.3 83.2,8.6',
+];
+
+const hanging = [
+  // string, a slightly bowed V from the nail to the two holes
+  'M 80,11.5 C 66,24 56,33 43,45',
+  'M 80,11.5 C 94,24 104,33 117,45',
+  // the holes the string goes through
+  'M 44.5,47 C 44.5,48.4 43.4,49.5 42,49.5 C 40.6,49.5 39.5,48.4 39.5,47 C 39.5,45.6 40.6,44.5 42,44.5 C 43.4,44.5 44.5,45.6 44.6,46.8',
+  'M 120.5,47 C 120.5,48.4 119.4,49.5 118,49.5 C 116.6,49.5 115.5,48.4 115.5,47 C 115.5,45.6 116.6,44.5 118,44.5 C 119.4,44.5 120.5,45.6 120.6,46.8',
+  // board: four strokes that overshoot the corners a touch, the way a pen does
+  'M 32,43 C 60,41.5 100,42.5 128,42',
+  'M 126,40 C 126.5,60 125.5,80 125,102',
+  'M 128,100 C 100,101 60,99.5 32,100.5',
+  'M 34,102 C 34.5,80 33.5,60 35,40',
+  // a little wood grain
+  'M 40,95 C 47,94.5 54,95.5 61,95',
+  'M 104,50 C 110,49.5 115,50.5 120,50',
+];
+
+// --- Fit the text on the board ------------------------------------------------
+// Board interior is x 34..126; leave a margin either side.
+const BOARD_WIDTH = 92 - 10;
+const BOARD_CENTRE = { x: 80, y: 71 };
+const MAX_SIZE = 26;
+const MIN_SIZE = 12;
+// Gaegu is a narrow face; ~0.46 em per character is a fair guess for mixed lowercase.
+const EM_PER_CHAR = 0.46;
+
+function widthAt(line: string, size: number): number {
+  return line.length * EM_PER_CHAR * size;
+}
+function sizeFor(line: string): number {
+  return Math.min(MAX_SIZE, BOARD_WIDTH / (line.length * EM_PER_CHAR));
+}
+
+/** Split a phrase into two lines at the space nearest the middle. */
+function balance(phrase: string): string[] {
+  const words = phrase.split(/\s+/).filter(Boolean);
+  if (words.length < 2) return [phrase];
+  let best: string[] = [phrase];
+  let bestLongest = Infinity;
+  for (let i = 1; i < words.length; i++) {
+    const a = words.slice(0, i).join(' ');
+    const b = words.slice(i).join(' ');
+    const longest = Math.max(a.length, b.length);
+    if (longest < bestLongest) {
+      bestLongest = longest;
+      best = [a, b];
+    }
+  }
+  return best;
+}
+
+// One line if it can be at least 18px; otherwise two lines sized by the longer one.
+let lines = [text.trim()];
+let fontSize = sizeFor(lines[0]);
+if (fontSize < 18) {
+  lines = balance(lines[0]);
+  fontSize = Math.min(...lines.map(sizeFor));
+}
+fontSize = Math.max(MIN_SIZE, Math.round(fontSize * 10) / 10);
+// A very long word can still overflow at the minimum size: squeeze it to fit.
+const squeeze = lines.some((l) => widthAt(l, fontSize) > BOARD_WIDTH);
+
+const lineHeight = fontSize * 1.05;
+// Baseline of the first line, so the block of lines is centred on the board.
+const firstBaseline = BOARD_CENTRE.y - ((lines.length - 1) * lineHeight) / 2 + fontSize * 0.34;
 ---
-<DoodleSlot name="closed-sign"><svg viewBox="0 0 10 10" aria-hidden="true"></svg></DoodleSlot>
+<DoodleSlot name="closed-sign" alt={text}>
+  <svg viewBox="0 0 160 110" role="img">
+    <title>{text}</title>
+    <Boil paths={nail} amount={0.35} />
+    <g class="hanging" style={`transform-origin:${NAIL.x}px ${NAIL.y}px`}>
+      <Boil paths={hanging} amount={0.6}>
+        <text
+          class="sign-text"
+          x={BOARD_CENTRE.x}
+          text-anchor="middle"
+          font-size={fontSize}
+        >
+          {lines.map((line, i) => (
+            <tspan
+              x={BOARD_CENTRE.x}
+              y={firstBaseline + i * lineHeight}
+              textLength={squeeze ? BOARD_WIDTH : undefined}
+              lengthAdjust={squeeze ? 'spacingAndGlyphs' : undefined}
+            >
+              {line}
+            </tspan>
+          ))}
+        </text>
+      </Boil>
+    </g>
+  </svg>
+</DoodleSlot>
+
+<style>
+  .sign-text {
+    font-family: var(--font-hand, 'Comic Sans MS', cursive);
+    font-weight: 700;
+    fill: currentColor;
+    stroke: none;
+  }
+
+  .hanging {
+    /* Rotate about the nail, in viewBox units (transform-origin is set inline). */
+    transform-box: view-box;
+    /* Sway amplitude in degrees. Hover/focus only changes this number, so the loop
+       keeps its phase instead of restarting. */
+    --sway: 2;
+  }
+
+  /* Wider swing on focus (everywhere) and on hover (pointer devices only). */
+  :global(.closed-sign):focus-visible .hanging {
+    --sway: 6;
+  }
+  @media (hover: hover) {
+    :global(.closed-sign):hover .hanging {
+      --sway: 6;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hanging {
+      /* 8 held positions along a sine, 0.6 s each. */
+      animation: sign-sway 4.8s steps(1, end) infinite;
+    }
+
+    @keyframes sign-sway {
+      0% {
+        transform: rotate(0deg);
+      }
+      12.5% {
+        transform: rotate(calc(0.7deg * var(--sway) * var(--motion)));
+      }
+      25% {
+        transform: rotate(calc(1deg * var(--sway) * var(--motion)));
+      }
+      37.5% {
+        transform: rotate(calc(0.7deg * var(--sway) * var(--motion)));
+      }
+      50% {
+        transform: rotate(0deg);
+      }
+      62.5% {
+        transform: rotate(calc(-0.7deg * var(--sway) * var(--motion)));
+      }
+      75% {
+        transform: rotate(calc(-1deg * var(--sway) * var(--motion)));
+      }
+      87.5% {
+        transform: rotate(calc(-0.7deg * var(--sway) * var(--motion)));
+      }
+      100% {
+        transform: rotate(0deg);
+      }
+    }
+  }
+</style>

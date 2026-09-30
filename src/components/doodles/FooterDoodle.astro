@@ -1,5 +1,110 @@
 ---
-// STUB — replaced by the doodle build agent.
+// Post-page footer: a rolling pin rolls slowly across from left to right, leaving a
+// trail of crumbs that fade behind it, on a quiet 9 s loop. Decorative.
+// Slot: footer-crumbs, 240 x 60 (draw at 480 x 120).
+//
+// Timing is shared between the pin and the crumbs (--footer-period), so they stay in
+// step whatever --motion is set to.
 import DoodleSlot from './DoodleSlot.astro';
+import Boil from './Boil.astro';
+
+// The pin, drawn centred on x = 0 and moved with a CSS transform.
+const pin = [
+  // barrel: round ends, top and bottom edges not quite parallel
+  'M -22,22 C -26,22 -26,40 -22,40 C -8,40.5 8,39.5 22,40 C 26,40 26,22 22,22 C 8,21.5 -8,22.5 -22.4,22.2',
+  // handles
+  'M -25,28 L -34,28 C -35.5,28 -35.5,34 -34,34 L -25,34',
+  'M 25,28 L 34,28 C 35.5,28 35.5,34 34,34 L 25,34',
+  // wood grain
+  'M -10,27 C -4,26.5 2,27.5 8,27',
+  'M -14,35 C -6,34.6 0,35.4 6,35',
+];
+
+// Where the pin travels, in viewBox px: fully off the left edge to fully off the right.
+const TRAVEL = { from: -45, to: 285 };
+// Distance from the pin's centre to the back of its trailing handle.
+const TAIL = 35;
+// Where the pin rests in the still frame.
+const REST_X = 200;
+// The shared keyframes keep a crumb hidden for the first 39% of its cycle.
+const HIDDEN_FRACTION = 0.39;
+
+// Crumbs along the "counter", left to right: dots and tiny loops.
+const crumbs = [
+  { x: 30, d: 'M 30,47 L 30.4,47.3' },
+  { x: 62, d: 'M 61,49 C 62,47.5 64.5,48.5 63.5,50.5 C 62.5,52 60.5,50.5 61.2,49.3' },
+  { x: 88, d: 'M 88,46 L 88.5,46.3' },
+  { x: 120, d: 'M 119,50 C 120,48.5 122.5,49.5 121.5,51.5 C 120.5,53 118.5,51.5 119.2,50.3' },
+  { x: 150, d: 'M 150,48 L 150.4,48.3' },
+  { x: 185, d: 'M 184,47 C 185,45.5 187.5,46.5 186.5,48.5 C 185.5,50 183.5,48.5 184.2,47.3' },
+].map((c) => {
+  // The crumb is dropped when the trailing handle has passed it.
+  const dropAt = (c.x + TAIL - TRAVEL.from) / (TRAVEL.to - TRAVEL.from);
+  // Negative delay that lines the keyframes' "appear" moment up with dropAt.
+  let delay = dropAt - HIDDEN_FRACTION;
+  if (delay >= 0) delay -= 1;
+  return { ...c, delay: Math.round(delay * 1000) / 1000, ahead: c.x > REST_X - TAIL };
+});
 ---
-<DoodleSlot name="footer-crumbs"><svg viewBox="0 0 10 10" aria-hidden="true"></svg></DoodleSlot>
+<DoodleSlot name="footer-crumbs">
+  <svg viewBox="0 0 240 60" aria-hidden="true" focusable="false" class="footer">
+    {crumbs.map((c) => (
+      <g class:list={['crumb', { ahead: c.ahead }]} style={`--delay:${c.delay}`}>
+        <Boil paths={[c.d]} amount={0.3} />
+      </g>
+    ))}
+    <g class="pin">
+      <Boil paths={pin} amount={0.6} />
+    </g>
+  </svg>
+</DoodleSlot>
+
+<style>
+  .footer {
+    /* --motion scales the pin's speed here (its "amplitude" is how fast it rolls). */
+    --footer-period: calc(9s / max(var(--motion), 0.05));
+  }
+
+  /* Still frame: the pin resting on the right with crumbs behind it. */
+  .pin {
+    transform-box: view-box;
+    transform: translateX(200px);
+  }
+  .crumb.ahead {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pin {
+      /* 36 steps across, about 4 hops a second at --motion: 1. */
+      animation: footer-pin-roll var(--footer-period) steps(36, end) infinite;
+    }
+    .crumb {
+      opacity: 1;
+      animation: footer-crumb-drop var(--footer-period) steps(1, end) infinite;
+      animation-delay: calc(var(--delay) * var(--footer-period));
+    }
+
+    @keyframes footer-pin-roll {
+      0% {
+        transform: translateX(-45px);
+      }
+      100% {
+        transform: translateX(285px);
+      }
+    }
+
+    /* Hidden until the pin passes, then it lies there for 61% of the loop and fades. */
+    @keyframes footer-crumb-drop {
+      0% {
+        opacity: 0;
+      }
+      39% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+  }
+</style>

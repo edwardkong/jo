@@ -1,7 +1,194 @@
 ---
-// STUB — replaced by the doodle build agent.
+// The small doodle beside each menu item: a whisk, some crumbs, or a star. Idle they
+// only boil (slower than the others, see doodles.css). While the surrounding
+// <a class="menu-item"> is hovered or focus-visible: the whisk rocks as if stirring,
+// the crumbs scatter a pixel or two, the star twinkles. Decorative.
+// Slots: item-whisk / item-crumb / item-star, 40 x 40 (draw at 80 x 80).
 import DoodleSlot from './DoodleSlot.astro';
-interface Props { kind: 'whisk' | 'crumb' | 'star' }
+import Boil from './Boil.astro';
+
+interface Props {
+  kind: 'whisk' | 'crumb' | 'star';
+}
 const { kind } = Astro.props;
+
+// Item lines are finer: the slot is small and they repeat down the page.
+const AMOUNT = 0.45;
+
+const whisk = [
+  // handle: two strokes and a rounded end
+  'M 18.5,22 C 18,27 17.8,32 17.5,37',
+  'M 21.5,22 C 22,27 22.2,32 22.5,37',
+  'M 17.5,37 C 19,38.6 21,38.6 22.5,37',
+  // the band where the wires meet the handle
+  'M 16,22 C 18,21 22,21 24,22',
+  // three wire loops, tops at slightly different heights
+  'M 20,21 C 7,17 6,3 19,3 C 33,3 33,17 20,21',
+  'M 20,21 C 12,17 11,5 21,4.5 C 29,4.5 28,17 20,21',
+  'M 20,21 C 16,17 16,7 20,6.5 C 24,7 24,17 20,21',
+];
+
+// A broken-off corner of a biscuit; the crumbs around it are separate parts so
+// each can scatter on its own.
+const biscuit = [
+  'M 8,20 C 8,12 14,8 20,8 Q 22.5,11.5 22,12 Q 19,15 19.5,15.5 Q 23,18 23,18.2 Q 20,22 20.2,22.3 C 17,26 10,26 8,20.6',
+  'M 12,15 L 12.5,15.4',
+  'M 15.5,20 L 16,20.3',
+];
+const crumbs = [
+  { d: 'M 27,12 C 28,10.5 30.5,11.5 29.5,13.5 C 28.5,15 26.5,13.5 27.2,12.3', dx: 1, dy: -1 },
+  { d: 'M 32,20 L 32.4,20.3', dx: 1.5, dy: 0.5 },
+  { d: 'M 26,26 C 27,24.5 29,25.5 28.5,27.5 C 27.5,29 25.5,27.5 26.2,26.3', dx: -1, dy: 1 },
+  { d: 'M 33,31 L 33.5,31.2', dx: 1, dy: 1 },
+  { d: 'M 13,32.5 L 13.4,32.7', dx: -1, dy: 0.5 },
+];
+
+// A star drawn in one go (a pentagram), edges bowed a little, not quite closing.
+const star = [
+  'M 20,5 Q 25,18.2 28.8,32 Q 17.5,24.4 5.8,15.6 Q 20,14.6 34.2,15.2 Q 22.4,24.2 11.4,32.2 Q 15.4,19.5 20.6,6.4',
+];
+const ticks = ['M 34,5 L 36.5,2.5', 'M 5,31.5 L 3,34.5'];
 ---
-<DoodleSlot name={`item-${kind}`}><svg viewBox="0 0 10 10" aria-hidden="true"></svg></DoodleSlot>
+<DoodleSlot name={`item-${kind}`}>
+  <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+    {kind === 'whisk' && (
+      <g class="stir">
+        <Boil paths={whisk} amount={AMOUNT} />
+      </g>
+    )}
+    {kind === 'crumb' && (
+      <>
+        <Boil paths={biscuit} amount={AMOUNT} />
+        {crumbs.map((c, i) => (
+          <g class="crumb" style={`--dx:${c.dx}px;--dy:${c.dy}px;--i:${i}`}>
+            <Boil paths={[c.d]} amount={0.3} />
+          </g>
+        ))}
+      </>
+    )}
+    {kind === 'star' && (
+      <>
+        <g class="twinkle">
+          <Boil paths={star} amount={AMOUNT} />
+        </g>
+        {ticks.map((d, i) => (
+          <g class={`tick tick-${i + 1}`}>
+            <Boil paths={[d]} amount={0.3} />
+          </g>
+        ))}
+      </>
+    )}
+  </svg>
+</DoodleSlot>
+
+<style>
+  .stir,
+  .twinkle,
+  .crumb {
+    transform-box: view-box;
+  }
+  .stir {
+    /* Rock about the end of the handle. */
+    transform-origin: 20px 37px;
+  }
+  .twinkle {
+    transform-origin: 20px 19px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Reactions run while the menu item is focused (everywhere) or hovered (pointer devices). */
+    :global(.menu-item):focus-visible .stir {
+      animation: item-whisk-stir 1.2s steps(1, end) infinite;
+    }
+    :global(.menu-item):focus-visible .crumb {
+      animation: item-crumb-scatter 0.7s steps(1, end) infinite;
+      animation-delay: calc(var(--i) * -0.14s);
+    }
+    :global(.menu-item):focus-visible .twinkle {
+      animation: item-star-twinkle 1.1s steps(1, end) infinite;
+    }
+    :global(.menu-item):focus-visible .tick {
+      animation: item-star-blink 1.1s steps(1, end) infinite;
+    }
+    :global(.menu-item):focus-visible .tick-2 {
+      animation-delay: -0.55s;
+    }
+
+    @media (hover: hover) {
+      :global(.menu-item):hover .stir {
+        animation: item-whisk-stir 1.2s steps(1, end) infinite;
+      }
+      :global(.menu-item):hover .crumb {
+        animation: item-crumb-scatter 0.7s steps(1, end) infinite;
+        animation-delay: calc(var(--i) * -0.14s);
+      }
+      :global(.menu-item):hover .twinkle {
+        animation: item-star-twinkle 1.1s steps(1, end) infinite;
+      }
+      :global(.menu-item):hover .tick {
+        animation: item-star-blink 1.1s steps(1, end) infinite;
+      }
+      :global(.menu-item):hover .tick-2 {
+        animation-delay: -0.55s;
+      }
+    }
+
+    @keyframes item-whisk-stir {
+      0% {
+        transform: rotate(0deg);
+      }
+      25% {
+        transform: rotate(calc(7deg * var(--motion)));
+      }
+      50% {
+        transform: rotate(0deg);
+      }
+      75% {
+        transform: rotate(calc(-7deg * var(--motion)));
+      }
+      100% {
+        transform: rotate(0deg);
+      }
+    }
+
+    @keyframes item-crumb-scatter {
+      0% {
+        transform: translate(0, 0);
+      }
+      50% {
+        transform: translate(calc(var(--dx) * var(--motion)), calc(var(--dy) * var(--motion)));
+      }
+      100% {
+        transform: translate(0, 0);
+      }
+    }
+
+    @keyframes item-star-twinkle {
+      0% {
+        transform: scale(1) rotate(0deg);
+      }
+      30% {
+        transform: scale(calc(1 + 0.08 * var(--motion))) rotate(calc(6deg * var(--motion)));
+      }
+      60% {
+        transform: scale(calc(1 - 0.05 * var(--motion))) rotate(calc(-4deg * var(--motion)));
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    /* The two sparkle ticks take turns. */
+    @keyframes item-star-blink {
+      0% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+  }
+</style>
