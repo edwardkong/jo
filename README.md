@@ -1,6 +1,6 @@
 # Small Hours (working title)
 
-A small bakery's online menu that is secretly a blog. Every item on the menu is a post; tapping one opens the writing instead of an order form. There is no cart, no checkout, no accounts, and none are planned. The name, intro line and the little sign are all editable, so "Small Hours" is only a placeholder.
+A personal blog laid out like a small menu: a homepage of sections and entries, each entry a post. The layout is the only thing that is fixed. The name, the intro, every label and phrase, and the sample posts are placeholders, all editable from the CMS. There is no cart, no checkout, no accounts, and none are planned.
 
 - **Live prototype:** https://edwardkong.github.io/jo/ (search engines are told to ignore it while it's a prototype)
 - **Doodle sketchbook:** https://edwardkong.github.io/jo/doodles/ (every animation slot at its real size, with tuning sliders)
@@ -31,7 +31,7 @@ Everything happens at **app.pagescms.org** in your phone's browser. Sign in with
 6. **Cover photo** – optional. Tap it to pick from your camera roll. Keep it under about 3 MB (see photo tips).
 7. **Draft (hidden from the site)** – this is on for every new post. While it's on, the post is not built into the site at all, so nobody can see it, not even with the link. Switch it off when it's ready.
 8. **Body** – the toolbar gives you headings, bold and italic, lists, quotes and photos. There's a small toggle to see the plain-text (Markdown) version if you ever want it.
-9. Tap **Save**. The site rebuilds itself; give it a minute or two.
+9. Tap **Save**. The site rebuilds itself. Give it a minute or two, then refresh the page: a save takes about 40 seconds to build and up to another minute to reach everyone. If you look sooner you see the previous version, which is why a deleted post can seem to linger.
 
 To change a post later, tap it in the list, edit, save. Changing the name later does not change the web address (that was fixed the first time you saved), which is fine, just good to know.
 
