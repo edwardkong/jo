@@ -43,8 +43,22 @@ const LookSchema = z.object({
   favicon: z.string().default(''),
   show_header_doodle: z.boolean().default(true),
   show_item_doodles: z.boolean().default(true),
-  show_sign: z.boolean().default(true),
+  show_badge: z.boolean().default(true),
   show_footer_doodle: z.boolean().default(true),
+  /**
+   * Her own drawings, uploaded through the CMS (Site settings > Look > Drawings).
+   * One entry per slot; `file` is the animated image, `still` the frame shown when
+   * motion is reduced. Paths are "/src/assets/uploads/..." as the CMS writes them.
+   */
+  drawings: z
+    .array(
+      z.object({
+        slot: z.enum(['header-steam', 'closed-sign', 'item-whisk', 'item-crumb', 'item-star', 'footer-crumbs']),
+        file: z.string().default(''),
+        still: z.string().default(''),
+      }),
+    )
+    .default([]),
 });
 
 export type Look = z.infer<typeof LookSchema>;
@@ -52,9 +66,9 @@ export type Look = z.infer<typeof LookSchema>;
 const SiteSchema = z.object({
   name: z.string().default('Untitled'),
   intro: z.string().default(''),
-  sign_text: z.string().default('closed'),
-  /** Where the closed sign points. Empty = not a link yet. */
-  sign_link: z.string().default(''),
+  /** Short text on the small hanging badge at the bottom of the homepage. */
+  badge_text: z.string().default(''),
+  badge_link: z.string().default(''),
   footer: z.string().default(''),
   /** Keep search engines away while it's a prototype. */
   noindex: z.boolean().default(true),

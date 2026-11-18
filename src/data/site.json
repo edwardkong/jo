@@ -1,8 +1,8 @@
 {
   "name": "Small Hours",
   "intro": "things I made, and things I thought about while making them.",
-  "sign_text": "closed",
-  "sign_link": "",
+  "badge_text": "closed",
+  "badge_link": "",
   "footer": "",
   "noindex": true,
   "wording": {
@@ -36,7 +36,8 @@
     "favicon": "",
     "show_header_doodle": true,
     "show_item_doodles": true,
-    "show_sign": true,
-    "show_footer_doodle": true
+    "show_footer_doodle": true,
+    "show_badge": true,
+    "drawings": []
   }
 }

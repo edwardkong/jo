@@ -22,7 +22,7 @@ media:
     # through the CMS are fine: "rename: safe" slugifies the name and lowercases the
     # extension. HEIC is left out because Astro's image tool cannot read it; iPhones send
     # JPEG when the browser asks for one.
-    extensions: [jpg, jpeg, png, webp, gif]
+    extensions: [jpg, jpeg, png, webp, gif, apng, svg]
     # false = keep the original name, safe = slugify it, random = generated name.
     rename: safe
 
@@ -206,14 +206,14 @@ content:
         label: Intro
         type: text
         description: "A sentence or two under the name."
-      - name: sign_text
-        label: Sign text
+      - name: badge_text
+        label: Badge text
         type: string
-        description: "What the hanging sign says."
-      - name: sign_link
-        label: Sign link
+        description: "A word or two on the small hanging badge at the bottom of the homepage. Empty leaves it blank."
+      - name: badge_link
+        label: Badge link
         type: string
-        description: "Where the sign goes when tapped. Leave empty and it goes nowhere."
+        description: "Where the badge goes when tapped. Leave empty and it is not a link."
       - name: footer
         label: Footer
         type: string
@@ -234,7 +234,7 @@ content:
       - name: look
         label: Look
         type: object
-        description: "Fonts, colours, tab icon, and which drawings show. The site rebuilds with the new look after you save."
+        description: "Fonts, colours, tab icon, which drawings show, and your own drawings. The site rebuilds with the new look after you save."
         fields:
           - name: font_heading
             label: Heading font
@@ -281,14 +281,45 @@ content:
             label: Show the small drawings beside each post
             type: boolean
             default: true
-          - name: show_sign
-            label: Show the hanging sign
+          - name: show_badge
+            label: Show the hanging badge
             type: boolean
             default: true
           - name: show_footer_doodle
             label: Show the drawing at the end of a post
             type: boolean
             default: true
+          - name: drawings
+            label: Drawings
+            type: object
+            list: true
+            description: "Replace a built-in drawing with your own. Upload a GIF, animated PNG or WebP drawn at twice the slot size (sizes are listed in the README and on /doodles). Add a still frame too; people who turn off motion see that one."
+            fields:
+              - name: slot
+                label: Which drawing
+                type: select
+                required: true
+                options:
+                  values:
+                    - { value: header-steam, label: "Beside the site name (120 × 120)" }
+                    - { value: closed-sign, label: "The hanging badge (160 × 110)" }
+                    - { value: item-whisk, label: "Beside posts, first of three (40 × 40)" }
+                    - { value: item-crumb, label: "Beside posts, second of three (40 × 40)" }
+                    - { value: item-star, label: "Beside posts, third of three (40 × 40)" }
+                    - { value: footer-crumbs, label: "End of a post (240 × 60)" }
+              - name: file
+                label: Animated file
+                type: image
+                required: true
+                options:
+                  media: photos
+                  extensions: [gif, png, apng, webp, svg]
+              - name: still
+                label: Still frame (optional)
+                type: image
+                options:
+                  media: photos
+                  extensions: [png, webp, svg, jpg, jpeg]
       - name: wording
         label: Wording
         type: object

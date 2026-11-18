@@ -79,6 +79,11 @@ The sign is the only one that "means" something: screen readers hear its text. T
 
 ### Putting it on the site
 
+The easy way, from the phone: Site settings > Look > **Drawings** in Pages CMS. Add a row, pick which drawing it replaces, upload the animated file, and upload a still frame if you have one. Save, and the site rebuilds with your drawing in place. Delete the row to go back to the built-in one.
+
+The code way, described below, does the same thing from the repo.
+
+
 1. Put both files in the `public/doodles/` folder.
 2. Open `src/doodles.ts` and add one line to the list at the bottom, for example:
 
@@ -131,7 +136,7 @@ If the site moves to another host, change `SITE_URL` in `worker/wrangler.toml` a
 
 Site settings > **Look** in Pages CMS. Fonts are Google Fonts family names typed exactly as on fonts.google.com; the build downloads them and serves them from the site itself, so nothing is fetched from Google by readers. Colours are six-digit hex values; the drawings pick up the text colour automatically. The tab icon takes an emoji. Four switches hide or show the drawings beside the name, beside each post, the sign, and the one at the end of a post. Every change rebuilds the site. If a font name is misspelled the build fails and the owner gets an email from GitHub; fix the name and save again.
 
-The drawings themselves are replaced by files, not settings: see "Doodles" above.
+Your own drawings go in under Look > Drawings as uploaded files; see "Doodles" above for sizes.
 
 ## Custom domain
 
@@ -238,5 +243,5 @@ Deploys: pushing to `main` runs `.github/workflows/deploy.yml` and publishes to 
 
 - Approval of notes: they publish straight away by design; she removes what she doesn't want.
 
-- The friends-only request page behind the "kitchen's closed" sign: the sign already takes a link (`sign_link` in Site settings).
+- The friends-only request page behind the hanging badge: the badge already takes a link (Badge link in Site settings).
 - Cart, checkout, payment, accounts: never.
