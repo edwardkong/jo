@@ -3,10 +3,10 @@
 A personal blog laid out like a small menu: a homepage of sections and entries, each entry a post. The layout is the only thing that is fixed. The name, the intro, every label and phrase, and the sample posts are placeholders, all editable from the CMS. There is no cart, no checkout, no accounts, and none are planned.
 
 - **Live prototype:** https://edwardkong.github.io/jo/ (search engines are told to ignore it while it's a prototype)
-- **Doodle sketchbook:** https://edwardkong.github.io/jo/doodles/ (every animation slot at its real size, with tuning sliders)
+- **Icon sheet:** https://edwardkong.github.io/jo/doodles/ (every built-in icon at its real size, with tuning sliders)
 - **Writing happens at:** https://app.pagescms.org (see "Writing a post from your phone")
 
-Built with [Astro](https://astro.build) 7 as a fully static site. Posts are Markdown files in `src/content/posts/`, menu sections are small YAML files in `src/content/sections/`, photos live in `src/assets/uploads/` and are resized at build time. The four animations are inline SVG stand-ins that will be swapped for hand-drawn files later.
+Built with [Astro](https://astro.build) 7 as a fully static site. Posts are Markdown files in `src/content/posts/`, menu sections are small YAML files in `src/content/sections/`, photos live in `src/assets/uploads/` and are resized at build time. The animated icons are inline SVG stand-ins that can be swapped for hand-drawn files.
 
 
 
@@ -29,7 +29,7 @@ Everything happens at **app.pagescms.org** in your phone's browser. Sign in with
 4. **Section** – pick one from the list. If you delete a section later its posts don't vanish, they gather under the "unsorted" heading (its wording is yours to set) until you give them a home.
 5. **Date** – starts as today. Newer posts sit higher on the menu.
 6. **Cover photo** – optional. Tap it to pick from your camera roll. Keep it under about 3 MB (see photo tips).
-7. **Small drawing** – optional. Pick which little drawing sits beside this post on the homepage, or leave it empty and posts take turns through the ones chosen in Site settings › Look.
+7. **Icon** – optional. Pick the icon beside this post on the homepage, or leave it empty and posts take turns through the icons chosen in Site settings › Look.
 8. **Draft (hidden from the site)** – this is on for every new post. While it's on, the post is not built into the site at all, so nobody can see it, not even with the link. Switch it off when it's ready.
 9. **Body** – the toolbar gives you headings, bold and italic, lists, quotes and photos. There's a small toggle to see the plain-text (Markdown) version if you ever want it.
 10. Tap **Save**. The site rebuilds itself. Give it a minute or two, then refresh the page: a save takes about 40 seconds to build and up to another minute to reach everyone. If you look sooner you see the previous version, which is why a deleted post can seem to linger.
@@ -49,15 +49,15 @@ To change a post later, tap it in the list, edit, save. Changing the name later 
 
 **Two posts with the same name.** The web address is made from the name, so two posts called "Lemon loaf" would get the same address. The site does not complain; the newer one quietly replaces the older one. Give the newer one a different name ("Lemon loaf, again") before you first save it.
 
-## Doodles
+## Icons
 
-The little drawings (beside the site name, beside each post, at the end of a post) come in a few built-in kinds. Pick them in Site settings › Look: one of four beside the name, any mix of eight beside posts, one of three at the end of a post, or none. They are stand-ins. They are pen lines drawn three times and flipped between a few times a second, so they shiver like a flipbook. They are there to be replaced by your own drawings whenever you like, without anyone touching the layout.
+The icons (beside the site name, beside each post, at the end of a post) come in a few built-in kinds. Pick them in Site settings › Look: a header icon, a set of post icons that take turns (any post can also pick its own), a footer icon, or none. They are stand-ins drawn as pen lines; the animation is a small stepped wobble. They are pen lines drawn three times and flipped between a few times a second, so they shiver like a flipbook. They are there to be replaced by your own icons whenever you like, without anyone touching the layout.
 
-You can see all of them at their real size, and play with how much they move, at `/doodles` on the site (the "sketchbook" page; it is not linked from the menu).
+You can see all of them at their real size, and play with how much they move, at `/doodles` on the site (not linked from the homepage).
 
 ### The slots
 
-Each drawing lives in a fixed box. Draw at the "draw at" size (twice the box, because phone screens are sharp); the site shrinks it down.
+Each icon lives in a fixed box. Draw at the "draw at" size (twice the box, because phone screens are sharp); the site shrinks it down.
 
 | slot name | where it appears | size on the page | draw at |
 |---|---|---|---|
@@ -69,7 +69,7 @@ Each drawing lives in a fixed box. Draw at the "draw at" size (twice the box, be
 
 All of them are decoration: screen readers skip them.
 
-### Exporting a drawing
+### Exporting an icon
 
 - Transparent background (the paper colour shows through).
 - One ink colour is enough; it does not have to match exactly.
@@ -79,7 +79,7 @@ All of them are decoration: screen readers skip them.
 
 ### Putting it on the site
 
-The easy way, from the phone: Site settings > Look > **Drawings** in Pages CMS. Add a row, pick which drawing it replaces, upload the animated file, and upload a still frame if you have one. Save, and the site rebuilds with your drawing in place. Delete the row to go back to the built-in one.
+The easy way, from the phone: Site settings > Look > **Custom icons** in Pages CMS. Add a row, pick which icon it replaces, upload the animated file, and upload a still frame if you have one. Save, and the site rebuilds with your icon in place. Delete the row to go back to the built-in one.
 
 The code way, described below, does the same thing from the repo.
 
@@ -132,11 +132,11 @@ Under every post there is an "order slip" where anyone can leave a short note, w
 
 If the site moves to another host, change `SITE_URL` in `worker/wrangler.toml` and redeploy the Worker; the form's address does not change.
 
-## Changing the look (fonts, colours, icon, drawings)
+## Changing the look (fonts, colours, icons)
 
-Site settings > **Look** in Pages CMS. Fonts are Google Fonts family names typed exactly as on fonts.google.com; the build downloads them and serves them from the site itself, so nothing is fetched from Google by readers. Colours are six-digit hex values; the drawings pick up the text colour automatically. The tab icon takes an emoji. Three pickers choose which built-in drawing sits beside the name, which ones take turns beside posts, and which closes a post; each has a "none". Every change rebuilds the site. If a font name is misspelled the build fails and the owner gets an email from GitHub; fix the name and save again.
+Site settings > **Look** in Pages CMS. Fonts are Google Fonts family names typed exactly as on fonts.google.com; the build downloads them and serves them from the site itself, so nothing is fetched from Google by readers. Colours are six-digit hex values; the icons pick up the text colour automatically. The tab icon takes an emoji. Three pickers choose the header icon, the post icons that take turns, and the footer icon; each has a "none". Every change rebuilds the site. If a font name is misspelled the build fails and the owner gets an email from GitHub; fix the name and save again.
 
-Your own drawings go in under Look > Drawings as uploaded files; see "Doodles" above for sizes. Wording is split into the handful of phrases people change and a "Wording (advanced)" group for the rest.
+Your own icons go in under Look > Custom icons as uploaded files; see "Icons" above for sizes. Wording is split into the handful of phrases people change and a "Wording (advanced)" group for the rest.
 
 ## Custom domain
 
@@ -200,7 +200,7 @@ Everything is driven by a handful of tokens at the top of `src/styles/global.css
 --accent: #b5452f;     /* red pencil, used sparingly */
 ```
 
-Change the hex values and the whole site follows. Two small things to keep in step by hand: the wavy underlines are tiny SVG drawings just below the tokens (`--wave-accent`, `--wave-soft`) and carry their own stroke colour; and `<meta name="theme-color">` in `Base.astro` is the paper colour for phone browser chrome.
+Change the hex values and the whole site follows. Two small things to keep in step by hand: the wavy underlines are tiny SVG icons just below the tokens (`--wave-accent`, `--wave-soft`) and carry their own stroke colour; and `<meta name="theme-color">` in `Base.astro` is the paper colour for phone browser chrome.
 
 ### Changing fonts
 

@@ -15,15 +15,15 @@ function size(w: number, h: number): string {
   return `${w} × ${h} css px · draw at ${w * 2} × ${h * 2}`;
 }
 ---
-<Base title="sketchbook" description="every built-in drawing, at size, for judging the motion">
+<Base title="icons" description="every built-in icon, at size, for judging the motion">
   <main class="sketchbook">
-    <h1>sketchbook</h1>
+    <h1>icons</h1>
     <p class="lead">
-      Every drawing on the site lives in a fixed box. These are the built-in ones at the
-      size they appear on the page; pick which ones to use in Site settings › Look. Each is
-      drawn three times and flipped between, so the line shivers; the movements are small
-      and stepped, like a flipbook. Your own drawings go in through Look › Drawings; draw them
-      at twice the size shown.
+      Every icon on the site lives in a fixed box. These are the built-in ones at the size
+      they appear on the page; pick which to use in Site settings › Look. Each is drawn three
+      times and flipped between, so the line shivers; the movements are small and stepped,
+      like a flipbook. Your own go in through Look › Custom icons; draw them at twice the
+      size shown.
     </p>
 
     <section class="knobs" aria-label="tuning knobs">
@@ -42,7 +42,7 @@ function size(w: number, h: number): string {
       </p>
     </section>
 
-    <h2>beside the site name <small>{size(doodleSlots.header.width, doodleSlots.header.height)}</small></h2>
+    <h2>header icon <small>{size(doodleSlots.header.width, doodleSlots.header.height)}</small></h2>
     <ul class="cards">
       {headerKinds.map((kind) => (
         <li class="card">
@@ -54,7 +54,7 @@ function size(w: number, h: number): string {
       ))}
     </ul>
 
-    <h2>beside each post <small>{size(40, 40)} · hover or focus to see the reaction</small></h2>
+    <h2>post icons <small>{size(40, 40)} · hover or focus to see the reaction</small></h2>
     <ul class="cards">
       {ITEM_KINDS.map((kind) => (
         <li class="card">
@@ -66,7 +66,7 @@ function size(w: number, h: number): string {
       ))}
     </ul>
 
-    <h2>end of a post <small>{size(doodleSlots.footer.width, doodleSlots.footer.height)}</small></h2>
+    <h2>footer icon <small>{size(doodleSlots.footer.width, doodleSlots.footer.height)}</small></h2>
     <ul class="cards">
       {footerKinds.map((kind) => (
         <li class="card">

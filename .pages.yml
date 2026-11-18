@@ -96,9 +96,9 @@ content:
         options:
           media: photos
       - name: icon
-        label: Small drawing
+        label: Icon
         type: select
-        description: "The drawing beside this post on the homepage. Leave empty and posts take turns through the ones chosen in Site settings."
+        description: "The icon beside this post on the homepage. Leave empty and posts take turns through the icons chosen in Site settings."
         options:
           placeholder: "take turns (default)"
           values:
@@ -241,7 +241,7 @@ content:
       - name: look
         label: Look
         type: object
-        description: "Fonts, colours, tab icon, which drawings show, and your own drawings. The site rebuilds with the new look after you save."
+        description: "Fonts, colours, icons, and the tab icon. The site rebuilds with the new look after you save."
         fields:
           - name: font_heading
             label: Heading font
@@ -281,7 +281,7 @@ content:
             type: string
             description: "An emoji or a letter or two, shown in the browser tab. Empty keeps the drawn default."
           - name: header_doodle
-            label: Drawing beside the site name
+            label: Header icon
             type: select
             default: cup
             options:
@@ -292,9 +292,9 @@ content:
                 - { value: moon, label: "moon and stars" }
                 - { value: none, label: "none" }
           - name: item_doodles
-            label: Drawings beside posts
+            label: Post icons
             type: select
-            description: "Pick any number; posts take turns. Pick none to leave the space empty."
+            description: "The icons beside posts that have not picked their own. Pick any number; posts take turns. Pick none to leave the space empty."
             options:
               multiple: true
               values:
@@ -307,7 +307,7 @@ content:
                 - { value: spiral, label: "spiral" }
                 - { value: arrow, label: "arrow" }
           - name: footer_doodle
-            label: Drawing at the end of a post
+            label: Footer icon
             type: select
             default: pin
             options:
@@ -317,13 +317,13 @@ content:
                 - { value: line, label: "a line drawing itself" }
                 - { value: none, label: "none" }
           - name: drawings
-            label: Drawings (your own)
+            label: Custom icons
             type: object
             list: true
-            description: "Replace a built-in drawing with your own. Upload a GIF, animated PNG or WebP drawn at twice the slot size (sizes are listed in the README and on /doodles). Add a still frame too; people who turn off motion see that one."
+            description: "Replace a built-in icon with your own image. Upload a GIF, animated PNG or WebP at twice the slot size (sizes are listed in the README and on /doodles). Add a still frame too; people who turn off motion see that one."
             fields:
               - name: slot
-                label: Which drawing
+                label: Which icon
                 type: select
                 required: true
                 options:
