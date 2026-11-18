@@ -1,10 +1,23 @@
 {
-  "name": "Small Hours",
+  "name": "doughanne",
   "intro": "things I made, and things I thought about while making them.",
-  "footer": "",
   "noindex": true,
-  "notes_endpoint": "",
-  "turnstile_site_key": "",
+  "look": {
+    "font_heading": "Gaegu",
+    "font_body": "Literata",
+    "color_background": "#f3ead9",
+    "color_background_deep": "#e9dcc4",
+    "color_ink": "#2c2219",
+    "color_ink_soft": "#7c6a57",
+    "color_accent": "#b5452f",
+    "header_doodle": "cup",
+    "item_doodles": [
+      "whisk",
+      "crumb",
+      "star"
+    ],
+    "footer_doodle": "pin"
+  },
   "wording": {
     "back_link": "← back",
     "empty_section": "nothing here yet.",
@@ -16,7 +29,6 @@
   "wording_advanced": {
     "home_tab": "home",
     "unsorted_title": "Unsorted",
-    "unsorted_blurb": "",
     "comments_empty": "no comments yet.",
     "comments_name_label": "name (optional)",
     "comments_body_label": "comment",
@@ -26,23 +38,5 @@
     "comments_anonymous": "anonymous",
     "not_found_tab": "not found",
     "not_found_text": "that page doesn't exist, or it did once and doesn't now."
-  },
-  "look": {
-    "font_heading": "Gaegu",
-    "font_body": "Literata",
-    "color_background": "#f3ead9",
-    "color_background_deep": "#e9dcc4",
-    "color_ink": "#2c2219",
-    "color_ink_soft": "#7c6a57",
-    "color_accent": "#b5452f",
-    "favicon": "",
-    "drawings": [],
-    "header_doodle": "cup",
-    "item_doodles": [
-      "whisk",
-      "crumb",
-      "star"
-    ],
-    "footer_doodle": "pin"
   }
 }
