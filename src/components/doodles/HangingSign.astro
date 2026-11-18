@@ -11,7 +11,7 @@ import Boil from './Boil.astro';
 interface Props {
   text?: string;
 }
-const { text = "kitchen's closed" } = Astro.props;
+const { text = 'closed' } = Astro.props;
 
 // The nail: transform-origin of the sway (see <style>). Keep in sync with NAIL below.
 const NAIL = { x: 80, y: 9 };

@@ -7,6 +7,7 @@ import CommentsSlot from '../../components/CommentsSlot.astro';
 import FooterDoodle from '../../components/doodles/FooterDoodle.astro';
 import { getPublishedPosts, UNSORTED, type Post } from '../../lib/menu';
 import { withBase } from '../../lib/url';
+import { getSite } from '../../lib/site';
 
 export async function getStaticPaths() {
   const posts = await getPublishedPosts();
@@ -18,6 +19,7 @@ interface Props {
 }
 const { post } = Astro.props;
 const { Content } = await render(post);
+const { wording } = getSite();
 
 // "From the oven", looked up from the section files; the raw id if the file is gone.
 const sections = await getCollection('sections');
@@ -40,7 +42,7 @@ const cover = post.data.cover;
 <Base title={post.data.title} description={post.data.description}>
   <article class="post">
     <p class="post__back wrap">
-      <a class="back-link" href={withBase('')}>← back to the menu</a>
+      <a class="back-link" href={withBase('')}>{wording.back_link}</a>
     </p>
 
     <header class="post__head wrap">

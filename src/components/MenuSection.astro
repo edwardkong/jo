@@ -2,6 +2,7 @@
 // One shelf of the menu: a section title, its blurb, and the posts filed under it.
 import type { MenuSection as Section } from '../lib/menu';
 import MenuItem from './MenuItem.astro';
+import { getSite } from '../lib/site';
 
 interface Props {
   section: Section;
@@ -10,6 +11,7 @@ interface Props {
 }
 const { section, startIndex = 0 } = Astro.props;
 const headingId = `section-${section.id}`;
+const { wording } = getSite();
 ---
 
 <section class="menu-section wrap" aria-labelledby={headingId}>
@@ -27,7 +29,7 @@ const headingId = `section-${section.id}`;
       ))}
     </ul>
   ) : (
-    <p class="menu-section__empty">nothing on this shelf yet — still proving.</p>
+    <p class="menu-section__empty">{wording.empty_section}</p>
   )}
 </section>
 

@@ -16,26 +16,26 @@ Everything happens at **app.pagescms.org** in your phone's browser. Sign in with
 
 **The menu on the left** has four things:
 
-- **Menu items** – the posts. Each one is a dish on the menu.
-- **Menu sections** – the headings on the menu (From the oven, Kitchen notes, Off-menu).
-- **Site settings** – the name over the door, the intro, the little sign, the footer.
+- **Posts**.
+- **Sections** – the groups posts are listed under.
+- **Site settings** – the name, intro, sign, footer, and under **Wording** every phrase the site prints (the empty-section line, the comment form, the not-found page). Nothing themed is hard-coded; change the words and the costume changes with them.
 - **Photos** – everything you have uploaded.
 
 **To write a new post**
 
-1. Open **Menu items** and tap the **+** (or "Add").
-2. **Name** – what it's called on the menu. This also becomes the web address, so pick it before you first save (see the note about same names below).
-3. **One line** – the short line under the name, like a menu: "dense on purpose, I think".
-4. **Section** – pick a heading from the list. If you delete a section later its posts don't vanish, they gather under "Specials" until you give them a home.
+1. Open **Posts** and tap the **+** (or "Add").
+2. **Title** – this also becomes the web address, so pick it before you first save (see the note about same names below).
+3. **Short description** – the line under the title on the homepage.
+4. **Section** – pick one from the list. If you delete a section later its posts don't vanish, they gather under the "unsorted" heading (its wording is yours to set) until you give them a home.
 5. **Date** – starts as today. Newer posts sit higher on the menu.
 6. **Cover photo** – optional. Tap it to pick from your camera roll. Keep it under about 3 MB (see photo tips).
-7. **Still in the oven (hidden from the menu)** – this is on for every new post. While it's on, the post is not built into the site at all, so nobody can see it, not even with the link. Switch it off when it's ready.
-8. **The writing** – the toolbar gives you headings, bold and italic, lists, quotes and photos. There's a small toggle to see the plain-text (Markdown) version if you ever want it.
+7. **Draft (hidden from the site)** – this is on for every new post. While it's on, the post is not built into the site at all, so nobody can see it, not even with the link. Switch it off when it's ready.
+8. **Body** – the toolbar gives you headings, bold and italic, lists, quotes and photos. There's a small toggle to see the plain-text (Markdown) version if you ever want it.
 9. Tap **Save**. The site rebuilds itself; give it a minute or two.
 
 To change a post later, tap it in the list, edit, save. Changing the name later does not change the web address (that was fixed the first time you saved), which is fine, just good to know.
 
-**How sections work.** A section is one small file with a heading, a line of small print and an "Order" number; lower comes first. Add one in **Menu sections**. Changing a heading is fine. An empty section still shows on the menu with nothing under it, which is intended: it reads as "coming soon".
+**How sections work.** A section is one small file with a heading, a line of small print and an "Order" number; lower comes first. Add one in **Sections**. Changing a heading is fine. An empty section still shows on the menu with nothing under it, which is intended: it reads as "coming soon".
 
 **Photo tips**
 
@@ -115,7 +115,7 @@ Under every post there is an "order slip" where anyone can leave a short note, w
 
 **How it works.** The slip posts to a small Cloudflare Worker (the code is in `worker/`). The Worker checks the note is from this site, that a hidden honeypot field is empty, that the note is not link-stuffed or shouting, that the sender has not posted more than five notes in a minute, and that the Cloudflare Turnstile captcha passed. Then it commits the note as a little file under `src/content/comments/<post>/` and the site rebuilds. A minute or two later the note is on the page.
 
-**Removing a note.** In Pages CMS, open **Notes from readers**, tap the note, and delete it. The site rebuilds without it. Notes cannot be created from the CMS, only read, trimmed or deleted.
+**Removing a note.** In Pages CMS, open **Comments**, tap the one you mean, and delete it. The site rebuilds without it. Notes cannot be created from the CMS, only read, trimmed or deleted.
 
 **Switching it on (owner, once).**
 
@@ -123,7 +123,7 @@ Under every post there is an "order slip" where anyone can leave a short note, w
 2. In the Cloudflare dashboard, Turnstile, add a widget for the site's hostname (invisible or managed mode both work). Note the **site key** and **secret key**.
 3. On GitHub, create a fine-grained personal access token scoped to this repo only, with Contents: read and write. Give it a long expiry and put a reminder in your calendar.
 4. From the `worker/` folder: `npx wrangler login`, then `npx wrangler secret put GITHUB_TOKEN`, `npx wrangler secret put TURNSTILE_SECRET`, then `npx wrangler deploy`. It prints the Worker URL.
-5. In Pages CMS, Site settings: paste the Worker URL into **Notes inbox address** and the Turnstile site key into **Captcha site key**. Save. The next build switches the form on.
+5. In Pages CMS, Site settings: paste the Worker URL into **Comment inbox address** and the Turnstile site key into **Captcha site key**. Save. The next build switches the form on.
 
 If the site moves to another host, change `SITE_URL` in `worker/wrangler.toml` and redeploy the Worker; the form's address does not change.
 

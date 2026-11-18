@@ -1,5 +1,6 @@
 // The menu: sections in her order, each with its published posts, newest first.
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { getSite } from './site';
 
 export type Post = CollectionEntry<'posts'>;
 
@@ -13,9 +14,9 @@ export interface MenuSection {
 
 /** Posts whose section file no longer exists land here instead of vanishing. */
 export const UNSORTED: Omit<MenuSection, 'posts'> = {
-  id: 'specials',
-  title: 'Specials',
-  blurb: "things that don't have a shelf yet",
+  id: 'unsorted',
+  title: getSite().wording.unsorted_title,
+  blurb: getSite().wording.unsorted_blurb || undefined,
   order: Number.MAX_SAFE_INTEGER,
 };
 

@@ -2,17 +2,17 @@
 // Nothing at this address.
 import Base from '../layouts/Base.astro';
 import { withBase } from '../lib/url';
+import { getSite } from '../lib/site';
+
+const { wording } = getSite();
 ---
 
-<Base title="not on the menu" description="we're out of that.">
+<Base title={wording.not_found_tab} description={wording.not_found_title}>
   <section class="gone wrap">
-    <h1 class="gone__title">we're out of that.</h1>
-    <p class="gone__note">
-      whatever you were after isn't on the menu today. maybe it sold out; maybe it was never
-      on the shelf. the rest is still there.
-    </p>
+    <h1 class="gone__title">{wording.not_found_title}</h1>
+    <p class="gone__note">{wording.not_found_text}</p>
     <p class="gone__back">
-      <a class="back-link" href={withBase('')}>← back to the menu</a>
+      <a class="back-link" href={withBase('')}>{wording.back_link}</a>
     </p>
   </section>
 </Base>

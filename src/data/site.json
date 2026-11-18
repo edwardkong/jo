@@ -4,5 +4,26 @@
   "sign_text": "kitchen's closed",
   "sign_link": "",
   "footer": "made by hand, mostly at night",
-  "noindex": true
+  "noindex": true,
+  "wording": {
+    "home_tab": "menu",
+    "back_link": "← back to the menu",
+    "empty_section": "nothing on this shelf yet — still proving.",
+    "unsorted_title": "Specials",
+    "unsorted_blurb": "things that don't have a shelf yet",
+    "comments_title": "notes from readers",
+    "comments_empty": "nobody has left a note yet.",
+    "comments_form_label": "order slip",
+    "comments_form_hint": "leave a note for the kitchen. no account, no email. it shows up here after a minute or two.",
+    "comments_name_label": "name (optional)",
+    "comments_body_label": "note",
+    "comments_submit": "pin it up",
+    "comments_sent": "pinned up. it will appear here once the page has rebuilt, a minute or two.",
+    "comments_failed": "that did not go through. try again in a moment.",
+    "comments_off": "notes are not switched on yet.",
+    "comments_anonymous": "someone",
+    "not_found_tab": "not on the menu",
+    "not_found_title": "we're out of that.",
+    "not_found_text": "whatever you were after isn't on the menu today. maybe it sold out; maybe it was never on the shelf. the rest is still there."
+  }
 }

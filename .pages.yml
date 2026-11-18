@@ -31,8 +31,8 @@ content:
   # Menu items (the posts). One Markdown file each: frontmatter on top, the writing below.
   # The "body" field is special in Pages CMS: it maps to the text under the frontmatter.
   - name: posts
-    label: Menu items
-    description: Each menu item is a post. Tap one to write.
+    label: Posts
+    description: One entry per post.
     type: collection
     path: src/content/posts
     # format is inferred from the .md extension (yaml-frontmatter); left implicit.
@@ -53,19 +53,19 @@ content:
         order: desc
     fields:
       - name: title
-        label: Name
+        label: Title
         type: string
         required: true
-        description: "What it is called on the menu. It also becomes the web address, so two posts with the same name will fight over it."
+        description: "Also becomes the web address, so two posts with the same title will fight over it."
       - name: description
-        label: One line
+        label: Short description
         type: string
-        description: "One line, like a menu. Something like: dense on purpose, I think."
+        description: "One line shown under the title on the homepage."
       - name: section
         label: Section
         type: reference
         required: true
-        description: "Which part of the menu it sits under."
+        description: "Which section it is listed under."
         options:
           collection: sections
           # What gets stored. The site keys sections by file name, so it wants
@@ -82,7 +82,7 @@ content:
       - name: date
         label: Date
         type: date
-        description: "Newer sits higher on the menu. Starts as today."
+        description: "Newer sits higher. Starts as today."
         # No "default" on purpose: a date field starts as the current local date unless
         # default: "" is set (docs: Date field, Notes). Saved as yyyy-MM-dd, which is also
         # what the field uses when "format" is omitted; spelled out here so it is visible.
@@ -91,17 +91,17 @@ content:
       - name: cover
         label: Cover photo
         type: image
-        description: "Optional. Shows on the menu and at the top of the post. Keep it under about 3 MB."
+        description: "Optional. Shows on the homepage and at the top of the post. Keep it under about 3 MB."
         # No "required": an empty cover is fine, the site treats "" and missing the same.
         options:
           media: photos
       - name: draft
-        label: Still in the oven (hidden from the menu)
+        label: Draft (hidden from the site)
         type: boolean
         default: true
-        description: "On for new posts. Switch it off when it is ready to be seen."
+        description: "On for new posts. Switch it off to publish."
       - name: body
-        label: The writing
+        label: Body
         type: rich-text
         description: "Headings, lists, quotes and photos all work. Photos go next to the cover in the same folder."
         options:
@@ -114,8 +114,8 @@ content:
   # Menu sections: the headings on the menu. Posts point at these by file name, so the
   # file name is the stable id and the heading can change freely.
   - name: sections
-    label: Menu sections
-    description: The headings on the menu. Every menu item sits under one.
+    label: Sections
+    description: The groups posts are listed under on the homepage.
     type: collection
     path: src/content/sections
     # Plain YAML files, no frontmatter. The site reads *.yml only, so the .yml here matters.
@@ -130,14 +130,14 @@ content:
         order: asc
     fields:
       - name: title
-        label: Heading
+        label: Title
         type: string
         required: true
-        description: "As it appears on the menu. Changing the heading is fine; renaming the file is not, because posts point at the file name."
+        description: "Changing the title is fine; renaming the file is not, because posts point at the file name."
       - name: blurb
-        label: Small print
+        label: Short description
         type: text
-        description: "A line under the heading. Optional."
+        description: "A line under the title. Optional."
       - name: order
         label: Order
         type: number
@@ -151,8 +151,8 @@ content:
   # grouped in a folder per post. They are live as soon as the site rebuilds. Her job
   # here is only to read them and delete the ones that don't belong.
   - name: comments
-    label: Notes from readers
-    description: Notes people left under posts. Delete anything that does not belong; the site updates by itself.
+    label: Comments
+    description: Comments left under posts. Delete anything that does not belong; the site updates by itself.
     type: collection
     path: src/content/comments
     format: yaml
@@ -170,17 +170,17 @@ content:
         order: desc
     fields:
       - name: post
-        label: Left on
+        label: On post
         type: string
         readonly: true
       - name: name
-        label: Signed
+        label: Name
         type: string
         readonly: true
       - name: body
-        label: The note
+        label: Comment
         type: text
-        description: "You can trim a note if you must; deleting the whole thing is usually kinder."
+        description: "You can trim a comment if you must; deleting the whole thing is usually kinder."
       - name: date
         label: When
         type: date
@@ -192,16 +192,16 @@ content:
   # Site settings: one JSON file with the name over the door, the sign, the footer.
   - name: site
     label: Site settings
-    description: The name over the door, the little sign, the footer.
+    description: Name, intro, sign, footer, and every phrase the site prints.
     type: file
     path: src/data/site.json
     format: json
     fields:
       - name: name
-        label: Name of the place
+        label: Site name
         type: string
         required: true
-        description: "Goes over the door and in the browser tab."
+        description: "Shown at the top of the homepage and in the browser tab."
       - name: intro
         label: Intro
         type: text
@@ -209,7 +209,7 @@ content:
       - name: sign_text
         label: Sign text
         type: string
-        description: "What the little hanging sign says."
+        description: "What the hanging sign says."
       - name: sign_link
         label: Sign link
         type: string
@@ -224,13 +224,86 @@ content:
         default: true
         description: "On while this is a prototype. Off if you ever want to be found."
       - name: notes_endpoint
-        label: Notes inbox address (owner)
+        label: Comment inbox address (owner)
         type: string
-        description: "The web address of the notes Worker. Empty switches the note form off. Set by the owner."
+        description: "The web address of the comment Worker. Empty switches the comment form off. Set by the owner."
       - name: turnstile_site_key
         label: Captcha site key (owner)
         type: string
         description: "Cloudflare Turnstile site key. Empty means no captcha. Set by the owner."
+      - name: wording
+        label: Wording
+        type: object
+        description: "Every phrase the site prints that is not a post. Change any of them; the layout does not care."
+        fields:
+          - name: home_tab
+            label: Homepage tab title
+            type: string
+            description: "Browser tab title of the homepage."
+          - name: back_link
+            label: Back link
+            type: string
+            description: "The link at the top of a post and on the not-found page."
+          - name: empty_section
+            label: Empty section line
+            type: string
+            description: "Shown under a section with no posts yet."
+          - name: unsorted_title
+            label: Unsorted section title
+            type: string
+            description: "Heading for posts whose section was deleted."
+          - name: unsorted_blurb
+            label: Unsorted section description
+            type: string
+            description: "Line under that heading. Optional."
+          - name: comments_title
+            label: Comments heading
+            type: string
+            description: "Above the comments under a post."
+          - name: comments_empty
+            label: No comments yet
+            type: string
+            description: "Shown when a post has no comments."
+          - name: comments_form_label
+            label: Comment form label
+            type: string
+            description: "Small caps label on the form."
+          - name: comments_form_hint
+            label: Comment form hint
+            type: text
+            description: "The sentence under that label."
+          - name: comments_name_label
+            label: Name field label
+            type: string
+          - name: comments_body_label
+            label: Comment field label
+            type: string
+          - name: comments_submit
+            label: Send button
+            type: string
+          - name: comments_sent
+            label: After sending
+            type: string
+            description: "Shown once a comment has gone through."
+          - name: comments_failed
+            label: If sending fails
+            type: string
+          - name: comments_off
+            label: Comments switched off
+            type: string
+            description: "Shown while the inbox address is empty."
+          - name: comments_anonymous
+            label: Name when none given
+            type: string
+          - name: not_found_tab
+            label: Not-found tab title
+            type: string
+          - name: not_found_title
+            label: Not-found heading
+            type: string
+          - name: not_found_text
+            label: Not-found text
+            type: text
 
 # ----------------------------------------------------------------------------------------
 # Repository-wide behaviour. The validator only allows: config, cache, hide,

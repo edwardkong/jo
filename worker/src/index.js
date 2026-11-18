@@ -25,7 +25,7 @@ export default {
 
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
     if (request.method !== 'POST') {
-      return new Response('notes inbox. nothing to see here.', { status: 200, headers: cors });
+      return new Response('comment inbox.', { status: 200, headers: cors });
     }
 
     const wantsJson = (request.headers.get('Accept') || '').includes('application/json');
@@ -43,7 +43,7 @@ export default {
 
     // Only accept posts from the site itself (browsers always send Origin on cross-site POSTs).
     const reqOrigin = request.headers.get('Origin');
-    if (reqOrigin && reqOrigin !== origin) return reply(403, { ok: false, error: 'wrong door.' });
+    if (reqOrigin && reqOrigin !== origin) return reply(403, { ok: false, error: 'requests must come from the site.' });
 
     let form;
     try {
@@ -61,23 +61,23 @@ export default {
 
     // --- spam checks, cheapest first ---
     if (trap) return reply(200, { ok: true }, slug); // honeypot filled: pretend it worked
-    if (!SLUG.test(slug)) return reply(400, { ok: false, error: 'which post was that for?' }, slug);
-    if (body.length < 2) return reply(400, { ok: false, error: 'the note is empty.' }, slug);
-    if (looksLikeSpam(body)) return reply(400, { ok: false, error: 'that reads like spam. sorry if it is not.' }, slug);
+    if (!SLUG.test(slug)) return reply(400, { ok: false, error: 'missing post id.' }, slug);
+    if (body.length < 2) return reply(400, { ok: false, error: 'the comment is empty.' }, slug);
+    if (looksLikeSpam(body)) return reply(400, { ok: false, error: 'that looks like spam. sorry if it is not.' }, slug);
 
     if (env.LIMITER) {
       const { success } = await env.LIMITER.limit({ key: ip || 'anon' });
-      if (!success) return reply(429, { ok: false, error: 'slow down a little. try again in a minute.' }, slug);
+      if (!success) return reply(429, { ok: false, error: 'too many in a row. try again in a minute.' }, slug);
     }
 
     if (env.TURNSTILE_SECRET) {
       const human = await verifyTurnstile(env.TURNSTILE_SECRET, token, ip);
-      if (!human) return reply(400, { ok: false, error: 'the little checkbox did not go through. try again.' }, slug);
+      if (!human) return reply(400, { ok: false, error: 'the captcha did not pass. try again.' }, slug);
     }
 
     // The post must exist on the live site (also stops notes on drafts or made-up slugs).
     const page = await fetch(`${env.SITE_URL}/menu/${slug}/`, { method: 'HEAD' });
-    if (!page.ok) return reply(404, { ok: false, error: 'that post is not on the menu.' }, slug);
+    if (!page.ok) return reply(404, { ok: false, error: 'that post does not exist.' }, slug);
 
     // --- write the note into the repo ---
     const now = new Date();
@@ -99,16 +99,16 @@ export default {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: `Note from a reader on ${slug}`,
+        message: `Comment on ${slug}`,
         content: toBase64(yaml),
         branch: env.GITHUB_BRANCH || 'main',
-        committer: { name: 'notes inbox', email: 'notes@users.noreply.github.com' },
+        committer: { name: 'comment inbox', email: 'comments@users.noreply.github.com' },
       }),
     });
 
     if (!res.ok) {
       console.error('github', res.status, await res.text());
-      return reply(502, { ok: false, error: 'the kitchen could not pin it up. try again later.' }, slug);
+      return reply(502, { ok: false, error: 'could not save the comment. try again later.' }, slug);
     }
     return reply(200, { ok: true }, slug);
   },

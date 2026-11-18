@@ -18,6 +18,7 @@ const { postId } = Astro.props;
 const site = getSite();
 const endpoint = site.notes_endpoint.trim();
 const turnstileKey = site.turnstile_site_key.trim();
+const w = site.wording;
 
 const notes = (await getCollection('comments', ({ data }) => data.post === postId)).sort(
   (a, b) => a.data.date.getTime() - b.data.date.getTime(),
@@ -31,17 +32,17 @@ function shortDate(d: Date): string {
 ---
 
 <section class="notes wrap" id="notes" aria-labelledby="notes-title">
-  <h2 class="notes__title" id="notes-title">notes from readers</h2>
+  <h2 class="notes__title" id="notes-title">{w.comments_title}</h2>
 
   {notes.length === 0 ? (
-    <p class="notes__empty">nobody has left a note yet.</p>
+    <p class="notes__empty">{w.comments_empty}</p>
   ) : (
     <ol class="notes__list">
       {notes.map((n) => (
         <li class="note">
           <p class="note__body">{n.data.body.trim()}</p>
           <p class="note__meta">
-            <span class="note__name">{n.data.name.trim() || 'someone'}</span>
+            <span class="note__name">{n.data.name.trim() || w.comments_anonymous}</span>
             {' · '}
             <time datetime={n.data.date.toISOString()}>{shortDate(n.data.date)}</time>
           </p>
@@ -56,11 +57,11 @@ function shortDate(d: Date): string {
     action={endpoint || undefined}
     data-notes-form
     data-enabled={endpoint ? 'true' : 'false'}
+    data-msg-sent={w.comments_sent}
+    data-msg-failed={w.comments_failed}
   >
-    <p class="order-slip__label">order slip</p>
-    <p class="order-slip__hint">
-      leave a note for the kitchen. no account, no email. it shows up here after a minute or two.
-    </p>
+    <p class="order-slip__label">{w.comments_form_label}</p>
+    <p class="order-slip__hint">{w.comments_form_hint}</p>
 
     <input type="hidden" name="post" value={postId} />
     {/* honeypot: real people never see this field; bots fill it in */}
@@ -69,20 +70,20 @@ function shortDate(d: Date): string {
     </p>
 
     <label class="order-slip__field">
-      <span>name (optional)</span>
+      <span>{w.comments_name_label}</span>
       <input type="text" name="name" maxlength="60" autocomplete="nickname" disabled={!endpoint} />
     </label>
     <label class="order-slip__field">
-      <span>note</span>
+      <span>{w.comments_body_label}</span>
       <textarea name="body" rows="4" maxlength="2000" required disabled={!endpoint}></textarea>
     </label>
 
     {turnstileKey && <div class="cf-turnstile" data-sitekey={turnstileKey} data-theme="light" data-size="flexible"></div>}
 
     <p class="order-slip__actions">
-      <button type="submit" disabled={!endpoint}>pin it up</button>
+      <button type="submit" disabled={!endpoint}>{w.comments_submit}</button>
       <span class="order-slip__status" role="status" aria-live="polite" data-notes-status>
-        {!endpoint && 'notes are not switched on yet.'}
+        {!endpoint && w.comments_off}
       </span>
     </p>
   </form>
@@ -96,9 +97,11 @@ function shortDate(d: Date): string {
   const form = document.querySelector<HTMLFormElement>('[data-notes-form]');
   const status = document.querySelector<HTMLElement>('[data-notes-status]');
   const sentFlag = new URLSearchParams(location.search).get('note') === 'sent';
+  const msgSent = form?.dataset.msgSent || 'sent.';
+  const msgFailed = form?.dataset.msgFailed || 'that did not go through.';
 
   if (sentFlag && status) {
-    status.textContent = 'pinned up. it will appear here once the page has rebuilt, a minute or two.';
+    status.textContent = msgSent;
   }
 
   if (form && form.dataset.enabled === 'true' && form.action) {
@@ -116,13 +119,13 @@ function shortDate(d: Date): string {
         const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
         if (res.ok && data.ok) {
           form.reset();
-          if (status) status.textContent = 'pinned up. it will appear here once the page has rebuilt, a minute or two.';
+          if (status) status.textContent = msgSent;
         } else {
-          if (status) status.textContent = data.error || 'that did not go through. try again in a moment.';
+          if (status) status.textContent = data.error || msgFailed;
           if (button) button.disabled = false;
         }
       } catch {
-        if (status) status.textContent = 'that did not go through. try again in a moment.';
+        if (status) status.textContent = msgFailed;
         if (button) button.disabled = false;
       }
       // Turnstile tokens are single-use; ask for a fresh one for the next note.
