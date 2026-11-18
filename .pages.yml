@@ -320,7 +320,7 @@ content:
             label: Custom icons
             type: object
             list: true
-            description: "Replace a built-in icon with your own image. Upload a GIF, animated PNG or WebP at twice the slot size (sizes are listed in the README and on /doodles). Add a still frame too; people who turn off motion see that one."
+            description: "Replace a built-in icon with your own image. Upload a GIF, animated PNG or WebP at twice the slot size (sizes are listed in the README and on /icons). Add a still frame too; people who turn off motion see that one."
             fields:
               - name: slot
                 label: Which icon

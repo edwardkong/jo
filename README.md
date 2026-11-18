@@ -3,7 +3,7 @@
 A personal blog laid out like a small menu: a homepage of sections and entries, each entry a post. The layout is the only thing that is fixed. The name, the intro, every label and phrase, and the sample posts are placeholders, all editable from the CMS. There is no cart, no checkout, no accounts, and none are planned.
 
 - **Live prototype:** https://edwardkong.github.io/jo/ (search engines are told to ignore it while it's a prototype)
-- **Icon sheet:** https://edwardkong.github.io/jo/doodles/ (every built-in icon at its real size, with tuning sliders)
+- **Icon sheet:** https://edwardkong.github.io/jo/icons/ (every built-in icon at its real size, with tuning sliders)
 - **Writing happens at:** https://app.pagescms.org (see "Writing a post from your phone")
 
 Built with [Astro](https://astro.build) 7 as a fully static site. Posts are Markdown files in `src/content/posts/`, menu sections are small YAML files in `src/content/sections/`, photos live in `src/assets/uploads/` and are resized at build time. The animated icons are inline SVG stand-ins that can be swapped for hand-drawn files.
@@ -53,7 +53,7 @@ To change a post later, tap it in the list, edit, save. Changing the name later 
 
 The icons (beside the site name, beside each post, at the end of a post) come in a few built-in kinds. Pick them in Site settings › Look: a header icon, a set of post icons that take turns (any post can also pick its own), a footer icon, or none. They are stand-ins drawn as pen lines; the animation is a small stepped wobble. They are pen lines drawn three times and flipped between a few times a second, so they shiver like a flipbook. They are there to be replaced by your own icons whenever you like, without anyone touching the layout.
 
-You can see all of them at their real size, and play with how much they move, at `/doodles` on the site (not linked from the homepage).
+You can see all of them at their real size, and play with how much they move, at `/icons` on the site (not linked from the homepage).
 
 ### The slots
 
@@ -84,7 +84,7 @@ The easy way, from the phone: Site settings > Look > **Custom icons** in Pages C
 The code way, described below, does the same thing from the repo.
 
 
-1. Put both files in the `public/doodles/` folder.
+1. Put both files in the `public/icons/` folder.
 2. Open `src/doodles.ts` and add one line to the list at the bottom, for example:
 
    ```ts
@@ -183,7 +183,7 @@ The site is a menu that is secretly a blog. There are three kinds of page:
 | The comments placeholder ("order slip") | `src/components/CommentsSlot.astro` |
 | The last line on every page | `src/components/SiteFooter.astro` |
 | Colours, paper, type sizes, links, focus rings, and the `.prose` styles for the writing | `src/styles/global.css` |
-| Doodle animations | `src/styles/doodles.css` and `src/components/doodles/` |
+| Doodle animations | `src/styles/doodles.css` and `src/components/icons/` |
 | The little browser-tab icon (a mug) | `public/favicon.svg` |
 
 Words like the site name, the intro line and the footer line come from `src/data/site.json` (edited in the CMS under "Site settings"), not from these files.

@@ -7,6 +7,17 @@ import { doodleSlots, HEADER_KINDS, ITEM_KINDS, FOOTER_KINDS } from '../doodles'
 import HeaderDoodle from '../components/doodles/HeaderDoodle.astro';
 import ItemDoodle from '../components/doodles/ItemDoodle.astro';
 import FooterDoodle from '../components/doodles/FooterDoodle.astro';
+import DoodleSlot from '../components/doodles/DoodleSlot.astro';
+import { getSite } from '../lib/site';
+
+const custom = getSite().look.drawings.filter((d) => d.file);
+const slotLabel: Record<string, string> = {
+  header: 'header icon',
+  'item-a': 'post icon, 1st/4th/7th',
+  'item-b': 'post icon, 2nd/5th/8th',
+  'item-c': 'post icon, 3rd/6th/9th',
+  footer: 'footer icon',
+};
 
 const headerKinds = HEADER_KINDS.filter((k) => k !== 'none');
 const footerKinds = FOOTER_KINDS.filter((k) => k !== 'none');
@@ -47,7 +58,7 @@ function size(w: number, h: number): string {
       {headerKinds.map((kind) => (
         <li class="card">
           <div class="box" style={`width:${doodleSlots.header.width}px;height:${doodleSlots.header.height}px`}>
-            <HeaderDoodle kind={kind} />
+            <HeaderDoodle kind={kind} builtin />
           </div>
           <p class="label">{kind}</p>
         </li>
@@ -59,7 +70,7 @@ function size(w: number, h: number): string {
       {ITEM_KINDS.map((kind) => (
         <li class="card">
           <div class="box" style="width:40px;height:40px">
-            <a class="menu-item" href={`#${kind}`} aria-label={kind}><ItemDoodle kind={kind} /></a>
+            <a class="menu-item" href={`#${kind}`} aria-label={kind}><ItemDoodle kind={kind} builtin /></a>
           </div>
           <p class="label">{kind}</p>
         </li>
@@ -71,12 +82,29 @@ function size(w: number, h: number): string {
       {footerKinds.map((kind) => (
         <li class="card">
           <div class="box" style={`width:${doodleSlots.footer.width}px;height:${doodleSlots.footer.height}px`}>
-            <FooterDoodle kind={kind} />
+            <FooterDoodle kind={kind} builtin />
           </div>
           <p class="label">{kind}</p>
         </li>
       ))}
     </ul>
+
+    <h2>custom icons <small>uploaded in Site settings › Look › Custom icons; these replace the built-in one in their slot</small></h2>
+    {custom.length === 0 ? (
+      <p class="lead">none uploaded yet.</p>
+    ) : (
+      <ul class="cards">
+        {custom.map((d) => (
+          <li class="card">
+            <div class="box" style={`width:${doodleSlots[d.slot].width}px;height:${doodleSlots[d.slot].height}px`}>
+              <DoodleSlot name={d.slot} />
+            </div>
+            <p class="label">{slotLabel[d.slot]}</p>
+            <p class="file">{d.file.replace(/^.*\//, '')}</p>
+          </li>
+        ))}
+      </ul>
+    )}
 
     <section class="notes">
       <h2>notes</h2>
@@ -176,6 +204,11 @@ function size(w: number, h: number): string {
     margin-top: 0.35rem;
     font-family: var(--hand);
     font-size: 1.05rem;
+  }
+  .file {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    word-break: break-all;
   }
   .notes {
     margin-top: 2.5rem;

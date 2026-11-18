@@ -13,8 +13,10 @@ interface Props {
   /** Empty string = decorative (hidden from screen readers). */
   alt?: string;
   class?: string;
+  /** Show the built-in stand-in even if a custom icon is configured (the icon sheet). */
+  builtin?: boolean;
 }
-const { name, alt = '', class: className = '' } = Astro.props;
+const { name, alt = '', class: className = '', builtin = false } = Astro.props;
 const spec = doodleSlots[name];
 
 // Raw URLs for anything in the uploads folder (Vite copies the bytes as they are).
@@ -31,12 +33,12 @@ function uploadUrl(path: string): string | undefined {
 let animated: string | undefined;
 let still: string | undefined;
 
-const fromCms = getSite().look.drawings.find((d) => d.slot === name && d.file);
+const fromCms = builtin ? undefined : getSite().look.drawings.find((d) => d.slot === name && d.file);
 if (fromCms) {
   animated = uploadUrl(fromCms.file);
   still = fromCms.still ? uploadUrl(fromCms.still) : undefined;
   if (!animated) console.warn(`[doodles] ${name}: "${fromCms.file}" is not in src/assets/uploads; using the stand-in.`);
-} else if (doodleFiles[name]) {
+} else if (!builtin && doodleFiles[name]) {
   const file = doodleFiles[name]!;
   animated = withBase(`doodles/${file}`);
   still = withBase(`doodles/${file.replace(/(\.[a-z0-9]+)$/i, '-still.png')}`);

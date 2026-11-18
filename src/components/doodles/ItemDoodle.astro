@@ -13,8 +13,10 @@ interface Props {
   kind: ItemKind;
   /** Which of the three rotating slots this is (1st, 2nd, 3rd item…). */
   slot?: 'a' | 'b' | 'c';
+  /** Ignore custom overrides (icon sheet). */
+  builtin?: boolean;
 }
-const { kind, slot = 'a' } = Astro.props;
+const { kind, slot = 'a', builtin = false } = Astro.props;
 
 // Item lines are finer: the slot is small and they repeat down the page.
 const AMOUNT = 0.45;
@@ -62,7 +64,7 @@ const simple: Record<'dot' | 'leaf' | 'heart' | 'spiral' | 'arrow', string[]> = 
   arrow: ['M 7,22 C 15,20 24,21 32,20', 'M 26,14 C 29,17 31,19 33,20 C 30,22 28,24 26,27'],
 };
 ---
-<DoodleSlot name={`item-${slot}`}>
+<DoodleSlot name={`item-${slot}`} builtin={builtin}>
   <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
     {kind === 'whisk' && (
       <g class="stir"><Boil paths={whisk} amount={AMOUNT} /></g>

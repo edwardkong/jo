@@ -10,9 +10,11 @@ import Boil from './Boil.astro';
 import type { HeaderKind } from '../../doodles';
 
 interface Props {
+  /** Ignore custom overrides (icon sheet). */
+  builtin?: boolean;
   kind: Exclude<HeaderKind, 'none'>;
 }
-const { kind } = Astro.props;
+const { kind, builtin = false } = Astro.props;
 const AMOUNT = 0.7;
 
 // --- cup (C curves only; see src/lib/wobble.ts: no arcs) ---
@@ -64,7 +66,7 @@ const stars = [
   ['M 90,74 L 90,82', 'M 86,78 L 94,78'],
 ];
 ---
-<DoodleSlot name="header">
+<DoodleSlot name="header" builtin={builtin}>
   <svg viewBox="0 0 120 120" aria-hidden="true" focusable="false">
     {kind === 'cup' && (
       <>
