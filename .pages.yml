@@ -241,7 +241,7 @@ content:
       - name: look
         label: Look
         type: object
-        description: "Fonts, colours, icons, and the tab icon. The site rebuilds with the new look after you save."
+        description: "Fonts, colours, icons, and the tab icon. To see every icon at real size, open /icons/ on the site (https://edwardkong.github.io/jo/icons/). The site rebuilds with the new look after you save."
         fields:
           - name: font_heading
             label: Heading font
@@ -320,7 +320,7 @@ content:
             label: Custom icons
             type: object
             list: true
-            description: "Replace a built-in icon with your own image. Upload a GIF, animated PNG or WebP at twice the slot size (sizes are listed in the README and on /icons). Add a still frame too; people who turn off motion see that one."
+            description: "Replace a built-in icon with your own image. Upload a GIF, animated PNG or WebP at twice the slot size (sizes are on the site's /icons/ page, which also shows what you have uploaded). Add a still frame too; people who turn off motion see that one."
             fields:
               - name: slot
                 label: Which icon
