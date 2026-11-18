@@ -1,26 +1,204 @@
 ---
-// PLACEHOLDER for the anonymous comment section.
-// Nothing here works yet on purpose. When a comment widget is chosen, replace the
-// inside of this component (or the whole file) and nothing else needs to change:
-// the post page just renders <CommentsSlot />.
+// Notes from readers: the anonymous comment section under a post.
+//
+// How it works: the form posts to a tiny Cloudflare Worker (worker/), which checks the
+// captcha and a few spam rules, then commits the note as a YAML file under
+// src/content/comments/<post>/. The site rebuilds and the note appears, no approval step.
+// She removes a note by deleting it in Pages CMS ("Notes from readers").
+//
+// Until the owner sets `notes_endpoint` in Site settings, the form is shown switched off.
+import { getCollection } from 'astro:content';
+import { getSite } from '../lib/site';
+
+interface Props {
+  /** The post id (URL slug) these notes belong to. */
+  postId: string;
+}
+const { postId } = Astro.props;
+const site = getSite();
+const endpoint = site.notes_endpoint.trim();
+const turnstileKey = site.turnstile_site_key.trim();
+
+const notes = (await getCollection('comments', ({ data }) => data.post === postId)).sort(
+  (a, b) => a.data.date.getTime() - b.data.date.getTime(),
+);
+
+/** "13 sep 2026" */
+function shortDate(d: Date): string {
+  const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  return `${d.getUTCDate()} ${months[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
 ---
 
-<aside class="order-slip wrap" aria-labelledby="order-slip-title">
-  <p class="order-slip__label" id="order-slip-title">order slip</p>
-  <p class="order-slip__note">a place to leave a note for the kitchen — coming soon</p>
-  <p class="order-slip__lines" aria-hidden="true"></p>
-</aside>
+<section class="notes wrap" id="notes" aria-labelledby="notes-title">
+  <h2 class="notes__title" id="notes-title">notes from readers</h2>
+
+  {notes.length === 0 ? (
+    <p class="notes__empty">nobody has left a note yet.</p>
+  ) : (
+    <ol class="notes__list">
+      {notes.map((n) => (
+        <li class="note">
+          <p class="note__body">{n.data.body.trim()}</p>
+          <p class="note__meta">
+            <span class="note__name">{n.data.name.trim() || 'someone'}</span>
+            {' · '}
+            <time datetime={n.data.date.toISOString()}>{shortDate(n.data.date)}</time>
+          </p>
+        </li>
+      ))}
+    </ol>
+  )}
+
+  <form
+    class="order-slip"
+    method="post"
+    action={endpoint || undefined}
+    data-notes-form
+    data-enabled={endpoint ? 'true' : 'false'}
+  >
+    <p class="order-slip__label">order slip</p>
+    <p class="order-slip__hint">
+      leave a note for the kitchen. no account, no email. it shows up here after a minute or two.
+    </p>
+
+    <input type="hidden" name="post" value={postId} />
+    {/* honeypot: real people never see this field; bots fill it in */}
+    <p class="order-slip__trap" aria-hidden="true">
+      <label>website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+    </p>
+
+    <label class="order-slip__field">
+      <span>name (optional)</span>
+      <input type="text" name="name" maxlength="60" autocomplete="nickname" disabled={!endpoint} />
+    </label>
+    <label class="order-slip__field">
+      <span>note</span>
+      <textarea name="body" rows="4" maxlength="2000" required disabled={!endpoint}></textarea>
+    </label>
+
+    {turnstileKey && <div class="cf-turnstile" data-sitekey={turnstileKey} data-theme="light" data-size="flexible"></div>}
+
+    <p class="order-slip__actions">
+      <button type="submit" disabled={!endpoint}>pin it up</button>
+      <span class="order-slip__status" role="status" aria-live="polite" data-notes-status>
+        {!endpoint && 'notes are not switched on yet.'}
+      </span>
+    </p>
+  </form>
+</section>
+
+{turnstileKey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+
+<script>
+  // Progressive enhancement: with JS we post in place and show a thank-you instead of
+  // leaving the page. Without JS the form posts normally and the Worker redirects back.
+  const form = document.querySelector<HTMLFormElement>('[data-notes-form]');
+  const status = document.querySelector<HTMLElement>('[data-notes-status]');
+  const sentFlag = new URLSearchParams(location.search).get('note') === 'sent';
+
+  if (sentFlag && status) {
+    status.textContent = 'pinned up. it will appear here once the page has rebuilt, a minute or two.';
+  }
+
+  if (form && form.dataset.enabled === 'true' && form.action) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      if (button) button.disabled = true;
+      if (status) status.textContent = 'sending…';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+        if (res.ok && data.ok) {
+          form.reset();
+          if (status) status.textContent = 'pinned up. it will appear here once the page has rebuilt, a minute or two.';
+        } else {
+          if (status) status.textContent = data.error || 'that did not go through. try again in a moment.';
+          if (button) button.disabled = false;
+        }
+      } catch {
+        if (status) status.textContent = 'that did not go through. try again in a moment.';
+        if (button) button.disabled = false;
+      }
+      // Turnstile tokens are single-use; ask for a fresh one for the next note.
+      const w = (window as unknown as { turnstile?: { reset: () => void } }).turnstile;
+      w?.reset?.();
+    });
+  }
+</script>
 
 <style>
-  /* A dashed ticket, slightly askew, so it is obviously a stand-in. */
-  .order-slip {
+  .notes {
     margin-top: 3.5rem;
-    padding: 1rem 1.1rem 1.2rem;
+  }
+
+  .notes__title {
+    font-family: var(--hand);
+    font-size: 1.6rem;
+    line-height: 1.1;
+    transform: rotate(-0.4deg);
+    transform-origin: left bottom;
+  }
+
+  .notes__empty {
+    margin-top: 0.6rem;
+    font-family: var(--hand);
+    font-size: 1.2rem;
+    color: var(--ink-soft);
+  }
+
+  /* Each note is a little slip pinned under the post. */
+  .notes__list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .note {
+    padding: 0.8rem 1rem 0.7rem;
+    background: rgba(255, 253, 248, 0.6);
+    border: 1px solid var(--paper-deep);
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(44, 34, 25, 0.08);
+  }
+
+  .note:nth-child(odd) {
+    transform: rotate(0.3deg);
+  }
+  .note:nth-child(even) {
+    transform: rotate(-0.35deg);
+  }
+
+  .note__body {
+    font-size: var(--text-base);
+    line-height: 1.55;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  .note__meta {
+    margin-top: 0.4rem;
+    font-family: var(--hand);
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+  }
+
+  /* The order slip: a dashed ticket, slightly askew. */
+  .order-slip {
+    margin-top: 1.75rem;
+    padding: 1rem 1.1rem 1.1rem;
     border: 2px dashed var(--ink-soft);
     border-radius: 4px;
     background: rgba(255, 253, 248, 0.5);
     transform: rotate(-0.5deg);
-    max-width: 24rem;
+    max-width: 28rem;
   }
 
   .order-slip__label {
@@ -31,21 +209,109 @@
     color: var(--ink-soft);
   }
 
-  .order-slip__note {
+  .order-slip__hint {
     margin-top: 0.35rem;
     font-family: var(--hand);
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     line-height: 1.2;
   }
 
-  /* three faint ruled lines, where the note would be written */
-  .order-slip__lines {
-    height: 4.2rem;
+  .order-slip__trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .order-slip__field {
+    display: block;
     margin-top: 0.9rem;
+  }
+
+  .order-slip__field span {
+    display: block;
+    font-family: var(--hand);
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.2rem;
+  }
+
+  .order-slip input[type='text'],
+  .order-slip textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.5rem 0.6rem;
+    font: inherit;
+    font-size: var(--text-base);
+    color: var(--ink);
+    background: transparent;
+    border: 0;
+    border-bottom: 1.5px solid var(--ink-soft);
+    border-radius: 0;
+  }
+
+  .order-slip textarea {
+    resize: vertical;
+    /* ruled lines, like a real slip */
+    line-height: 1.6rem;
     background-image: repeating-linear-gradient(
       to bottom,
-      transparent 0 1.3rem,
-      var(--paper-deep) 1.3rem calc(1.3rem + 1px)
+      transparent 0 calc(1.6rem - 1px),
+      var(--paper-deep) calc(1.6rem - 1px) 1.6rem
     );
+    background-attachment: local;
+  }
+
+  .order-slip input:focus-visible,
+  .order-slip textarea:focus-visible {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+
+  .order-slip input:disabled,
+  .order-slip textarea:disabled {
+    opacity: 0.5;
+  }
+
+  .cf-turnstile {
+    margin-top: 0.9rem;
+  }
+
+  .order-slip__actions {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1rem;
+  }
+
+  .order-slip button {
+    font-family: var(--hand);
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0.5rem 1rem 0.55rem;
+    color: var(--ink);
+    background: transparent;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px 999px 999px 999px / 999px 999px 999px 999px;
+    cursor: pointer;
+    transform: rotate(0.6deg);
+  }
+
+  .order-slip button:hover:not(:disabled) {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .order-slip button:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .order-slip__status {
+    font-family: var(--hand);
+    font-size: 1.1rem;
+    color: var(--ink-soft);
   }
 </style>

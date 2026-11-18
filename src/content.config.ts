@@ -47,4 +47,16 @@ const posts = defineCollection({
     }),
 });
 
-export const collections = { sections, posts };
+// Notes from readers. One small YAML file each, written by the notes Worker (worker/),
+// removed by her from the CMS. Published as soon as the site rebuilds; no approval step.
+const comments = defineCollection({
+  loader: glob({ pattern: '**/*.yml', base: './src/content/comments' }),
+  schema: z.object({
+    post: z.string(),                       // the post id (URL slug) the note was left on
+    name: z.string().default(''),           // optional; empty shows as "someone"
+    body: z.string(),
+    date: z.coerce.date(),
+  }),
+});
+
+export const collections = { sections, posts, comments };

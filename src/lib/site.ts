@@ -11,6 +11,10 @@ const SiteSchema = z.object({
   footer: z.string().default(''),
   /** Keep search engines away while it's a prototype. */
   noindex: z.boolean().default(true),
+  /** URL of the deployed notes Worker (worker/). Empty = the note form is switched off. */
+  notes_endpoint: z.string().default(''),
+  /** Cloudflare Turnstile site key (public). Empty = no captcha widget. */
+  turnstile_site_key: z.string().default(''),
 });
 
 export type SiteSettings = z.infer<typeof SiteSchema>;

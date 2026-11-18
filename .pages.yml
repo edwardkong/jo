@@ -147,6 +147,48 @@ content:
           min: 0
 
   # --------------------------------------------------------------------------------------
+  # Notes from readers: written by the notes Worker (worker/), one small file per note,
+  # grouped in a folder per post. They are live as soon as the site rebuilds. Her job
+  # here is only to read them and delete the ones that don't belong.
+  - name: comments
+    label: Notes from readers
+    description: Notes people left under posts. Delete anything that does not belong; the site updates by itself.
+    type: collection
+    path: src/content/comments
+    format: yaml
+    subfolders: true
+    # Nobody writes notes from here, so no "new" button. Deleting and editing stay on.
+    operations:
+      create: false
+    view:
+      primary: body
+      fields: [body, name, post, date]
+      sort: [date]
+      search: [body, name, post]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: post
+        label: Left on
+        type: string
+        readonly: true
+      - name: name
+        label: Signed
+        type: string
+        readonly: true
+      - name: body
+        label: The note
+        type: text
+        description: "You can trim a note if you must; deleting the whole thing is usually kinder."
+      - name: date
+        label: When
+        type: date
+        readonly: true
+        options:
+          time: true
+
+  # --------------------------------------------------------------------------------------
   # Site settings: one JSON file with the name over the door, the sign, the footer.
   - name: site
     label: Site settings
@@ -181,6 +223,14 @@ content:
         type: boolean
         default: true
         description: "On while this is a prototype. Off if you ever want to be found."
+      - name: notes_endpoint
+        label: Notes inbox address (owner)
+        type: string
+        description: "The web address of the notes Worker. Empty switches the note form off. Set by the owner."
+      - name: turnstile_site_key
+        label: Captcha site key (owner)
+        type: string
+        description: "Cloudflare Turnstile site key. Empty means no captcha. Set by the owner."
 
 # ----------------------------------------------------------------------------------------
 # Repository-wide behaviour. The validator only allows: config, cache, hide,

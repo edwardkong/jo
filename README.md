@@ -109,6 +109,24 @@ If a reader's phone or computer is set to "reduce motion", every doodle holds st
 - Hover reactions key off `.menu-item` (each item link) and `.closed-sign` (the sign wrapper) and only run inside `@media (hover: hover)`; `:focus-visible` triggers the same reactions everywhere.
 - The menu-item doodles boil at 0.6× the root rate (`--boil-rate` on the slot) so twenty of them stay quiet.
 
+## Notes from readers (comments)
+
+Under every post there is an "order slip" where anyone can leave a short note, with an optional name. No account, no email. Notes go live by themselves; nobody approves them first.
+
+**How it works.** The slip posts to a small Cloudflare Worker (the code is in `worker/`). The Worker checks the note is from this site, that a hidden honeypot field is empty, that the note is not link-stuffed or shouting, that the sender has not posted more than five notes in a minute, and that the Cloudflare Turnstile captcha passed. Then it commits the note as a little file under `src/content/comments/<post>/` and the site rebuilds. A minute or two later the note is on the page.
+
+**Removing a note.** In Pages CMS, open **Notes from readers**, tap the note, and delete it. The site rebuilds without it. Notes cannot be created from the CMS, only read, trimmed or deleted.
+
+**Switching it on (owner, once).**
+
+1. Create a free Cloudflare account if you do not have one.
+2. In the Cloudflare dashboard, Turnstile, add a widget for the site's hostname (invisible or managed mode both work). Note the **site key** and **secret key**.
+3. On GitHub, create a fine-grained personal access token scoped to this repo only, with Contents: read and write. Give it a long expiry and put a reminder in your calendar.
+4. From the `worker/` folder: `npx wrangler login`, then `npx wrangler secret put GITHUB_TOKEN`, `npx wrangler secret put TURNSTILE_SECRET`, then `npx wrangler deploy`. It prints the Worker URL.
+5. In Pages CMS, Site settings: paste the Worker URL into **Notes inbox address** and the Turnstile site key into **Captcha site key**. Save. The next build switches the form on.
+
+If the site moves to another host, change `SITE_URL` in `worker/wrangler.toml` and redeploy the Worker; the form's address does not change.
+
 ## Owner setup
 1. **Install the Pages CMS GitHub App.** Push this repo to GitHub, sign in at app.pagescms.org with GitHub, and install the app on your account, granting access to this repository only. It needs read and write on contents.
 2. **Open the repo in Pages CMS.** It reads `.pages.yml` from the branch you pick (main). You should see Menu items, Menu sections, Site settings and Photos. If the config has a problem, the CMS shows the validation error on its Settings page; the file was checked against the Pages CMS 2.1.8 validator, so a problem most likely means a typo from a later edit.
@@ -200,6 +218,7 @@ Deploys: pushing to `main` runs `.github/workflows/deploy.yml` and publishes to 
 
 ## What is deliberately not built yet
 
-- Comments: the dashed "order slip" under each post is the placeholder (`src/components/CommentsSlot.astro`).
+- Approval of notes: they publish straight away by design; she removes what she doesn't want.
+
 - The friends-only request page behind the "kitchen's closed" sign: the sign already takes a link (`sign_link` in Site settings).
 - Cart, checkout, payment, accounts: never.
