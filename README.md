@@ -50,7 +50,7 @@ To change a post later, tap it in the list, edit, save. Changing the name later 
 
 ## Doodles
 
-The little drawings on the menu (the steaming cup, the "kitchen's closed" sign, the whisk / crumbs / star beside each item, the rolling pin under a post) are stand-ins. They are pen lines drawn three times and flipped between a few times a second, so they shiver like a flipbook. They are there to be replaced by your own drawings whenever you like, without anyone touching the layout.
+The little drawings (beside the site name, beside each post, at the end of a post) come in a few built-in kinds. Pick them in Site settings › Look: one of four beside the name, any mix of eight beside posts, one of three at the end of a post, or none. They are stand-ins. They are pen lines drawn three times and flipped between a few times a second, so they shiver like a flipbook. They are there to be replaced by your own drawings whenever you like, without anyone touching the layout.
 
 You can see all of them at their real size, and play with how much they move, at `/doodles` on the site (the "sketchbook" page; it is not linked from the menu).
 
@@ -60,14 +60,13 @@ Each drawing lives in a fixed box. Draw at the "draw at" size (twice the box, be
 
 | slot name | where it appears | size on the page | draw at |
 |---|---|---|---|
-| `header-steam` | homepage header, beside the name | 120 × 120 | 240 × 240 |
-| `closed-sign` | homepage, below the last menu section | 160 × 110 | 320 × 220 |
-| `item-whisk` | beside menu items (takes turns with crumb and star) | 40 × 40 | 80 × 80 |
-| `item-crumb` | beside menu items | 40 × 40 | 80 × 80 |
-| `item-star` | beside menu items | 40 × 40 | 80 × 80 |
-| `footer-crumbs` | bottom of a post page | 240 × 60 | 480 × 120 |
+| `header` | homepage, beside the site name | 120 × 120 | 240 × 240 |
+| `item-a` | beside posts: 1st, 4th, 7th… | 40 × 40 | 80 × 80 |
+| `item-b` | beside posts: 2nd, 5th, 8th… | 40 × 40 | 80 × 80 |
+| `item-c` | beside posts: 3rd, 6th, 9th… | 40 × 40 | 80 × 80 |
+| `footer` | end of a post | 240 × 60 | 480 × 120 |
 
-The sign is the only one that "means" something: screen readers hear its text. The others are decoration.
+All of them are decoration: screen readers skip them.
 
 ### Exporting a drawing
 
@@ -75,7 +74,7 @@ The sign is the only one that "means" something: screen readers hear its text. T
 - One ink colour is enough; it does not have to match exactly.
 - Animated: **APNG is the best choice** (crisp lines, transparency, no colour banding). GIF or animated WebP are fine too.
 - Keep it slow: about 6 to 8 frames per second, and loop it.
-- Also export **one still frame** as a PNG, named the same as the animation plus `-still`. For example `closed-sign.png` and `closed-sign-still.png`. The still is what people see if their phone is set to reduce motion, and it is what shows while the animation loads.
+- Also export **one still frame** as a PNG, named the same as the animation plus `-still`. For example `header.png` and `header-still.png`. The still is what people see if their phone is set to reduce motion, and it is what shows while the animation loads.
 
 ### Putting it on the site
 
@@ -89,7 +88,7 @@ The code way, described below, does the same thing from the repo.
 
    ```ts
    export const doodleFiles = {
-     'closed-sign': 'closed-sign.png',
+     header: 'header.png',
    };
    ```
 
@@ -111,7 +110,7 @@ If a reader's phone or computer is set to "reduce motion", every doodle holds st
 ### For the owner
 
 - Stand-in paths must avoid the SVG arc command (`A`); `wobble()` throws at build time if it sees one. Draw curves with `C`/`Q`.
-- Hover reactions key off `.menu-item` (each item link) and `.closed-sign` (the sign wrapper) and only run inside `@media (hover: hover)`; `:focus-visible` triggers the same reactions everywhere.
+- Hover reactions key off `.menu-item` (each post link) and only run on devices that can hover; `:focus-visible` triggers the same reactions everywhere.
 - The menu-item doodles boil at 0.6× the root rate (`--boil-rate` on the slot) so twenty of them stay quiet.
 
 ## Notes from readers (comments)
@@ -134,9 +133,9 @@ If the site moves to another host, change `SITE_URL` in `worker/wrangler.toml` a
 
 ## Changing the look (fonts, colours, icon, drawings)
 
-Site settings > **Look** in Pages CMS. Fonts are Google Fonts family names typed exactly as on fonts.google.com; the build downloads them and serves them from the site itself, so nothing is fetched from Google by readers. Colours are six-digit hex values; the drawings pick up the text colour automatically. The tab icon takes an emoji. Four switches hide or show the drawings beside the name, beside each post, the sign, and the one at the end of a post. Every change rebuilds the site. If a font name is misspelled the build fails and the owner gets an email from GitHub; fix the name and save again.
+Site settings > **Look** in Pages CMS. Fonts are Google Fonts family names typed exactly as on fonts.google.com; the build downloads them and serves them from the site itself, so nothing is fetched from Google by readers. Colours are six-digit hex values; the drawings pick up the text colour automatically. The tab icon takes an emoji. Three pickers choose which built-in drawing sits beside the name, which ones take turns beside posts, and which closes a post; each has a "none". Every change rebuilds the site. If a font name is misspelled the build fails and the owner gets an email from GitHub; fix the name and save again.
 
-Your own drawings go in under Look > Drawings as uploaded files; see "Doodles" above for sizes.
+Your own drawings go in under Look > Drawings as uploaded files; see "Doodles" above for sizes. Wording is split into the handful of phrases people change and a "Wording (advanced)" group for the rest.
 
 ## Custom domain
 
@@ -180,7 +179,6 @@ The site is a menu that is secretly a blog. There are three kinds of page:
 | Name + cup + intro at the top of the menu | `src/components/SiteHeader.astro` |
 | One shelf (section title, blurb, its items) | `src/components/MenuSection.astro` |
 | One line of the menu (doodle, name, dotted leader, date, description, thumbnail) | `src/components/MenuItem.astro` |
-| The hanging sign, centred under the last shelf | `src/components/ClosedSign.astro` |
 | The comments placeholder ("order slip") | `src/components/CommentsSlot.astro` |
 | The last line on every page | `src/components/SiteFooter.astro` |
 | Colours, paper, type sizes, links, focus rings, and the `.prose` styles for the writing | `src/styles/global.css` |
@@ -243,5 +241,4 @@ Deploys: pushing to `main` runs `.github/workflows/deploy.yml` and publishes to 
 
 - Approval of notes: they publish straight away by design; she removes what she doesn't want.
 
-- The friends-only request page behind the hanging badge: the badge already takes a link (Badge link in Site settings).
 - Cart, checkout, payment, accounts: never.

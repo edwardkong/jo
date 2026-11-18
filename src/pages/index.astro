@@ -1,9 +1,8 @@
 ---
-// The menu. Header, one shelf per section, the closed sign, footer.
+// The homepage. Header, one block per section, footer.
 import Base from '../layouts/Base.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import MenuSection from '../components/MenuSection.astro';
-import ClosedSign from '../components/ClosedSign.astro';
 import { getMenu } from '../lib/menu';
 import { getSite } from '../lib/site';
 
@@ -29,7 +28,6 @@ const shelves = menu.map((section) => {
     ))}
   </div>
 
-  {site.look.show_badge && <ClosedSign text={site.badge_text} href={site.badge_link} />}
 </Base>
 
 <style>

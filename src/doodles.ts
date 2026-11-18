@@ -1,17 +1,11 @@
 // Doodle slots. Each animated doodle lives in a fixed-size slot so that a hand-drawn
 // image file can replace the inline SVG stand-in without touching layout.
 //
-// To swap in a drawing: export it (APNG recommended; GIF or WebP also fine) at 2x the
-// slot size, save it in public/doodles/ together with a still frame named
-// "<file>-still.png", then add one line to `doodleFiles` below.
+// Which built-in drawing fills a slot is chosen in the CMS (Site settings > Look).
+// Her own drawings are uploaded there too (Look > Drawings). The map at the bottom is
+// the code-side alternative: a file in public/doodles/ plus one line here.
 
-export type DoodleName =
-  | 'header-steam'
-  | 'closed-sign'
-  | 'item-whisk'
-  | 'item-crumb'
-  | 'item-star'
-  | 'footer-crumbs';
+export type DoodleName = 'header' | 'item-a' | 'item-b' | 'item-c' | 'footer';
 
 export interface DoodleSlotSpec {
   /** CSS pixels */
@@ -22,16 +16,24 @@ export interface DoodleSlotSpec {
 }
 
 export const doodleSlots: Record<DoodleName, DoodleSlotSpec> = {
-  'header-steam': { width: 120, height: 120, where: 'homepage header, beside the name' },
-  'closed-sign': { width: 160, height: 110, where: 'homepage, below the last menu section' },
-  'item-whisk': { width: 40, height: 40, where: 'menu items (rotates with crumb and star)' },
-  'item-crumb': { width: 40, height: 40, where: 'menu items (rotates with whisk and star)' },
-  'item-star': { width: 40, height: 40, where: 'menu items (rotates with whisk and crumb)' },
-  'footer-crumbs': { width: 240, height: 60, where: 'post page footer' },
+  header: { width: 120, height: 120, where: 'homepage, beside the site name' },
+  'item-a': { width: 40, height: 40, where: 'beside posts: 1st, 4th, 7th…' },
+  'item-b': { width: 40, height: 40, where: 'beside posts: 2nd, 5th, 8th…' },
+  'item-c': { width: 40, height: 40, where: 'beside posts: 3rd, 6th, 9th…' },
+  footer: { width: 240, height: 60, where: 'end of a post' },
 };
 
+/** The built-in drawings to choose from, per slot. "none" leaves the slot empty. */
+export const HEADER_KINDS = ['cup', 'pencil', 'leaf', 'moon', 'none'] as const;
+export const ITEM_KINDS = ['whisk', 'crumb', 'star', 'dot', 'leaf', 'heart', 'spiral', 'arrow'] as const;
+export const FOOTER_KINDS = ['pin', 'dots', 'line', 'none'] as const;
+export type HeaderKind = (typeof HEADER_KINDS)[number];
+export type ItemKind = (typeof ITEM_KINDS)[number];
+export type FooterKind = (typeof FOOTER_KINDS)[number];
+
 /**
- * Her drawings, once they exist. Filenames are relative to public/doodles/.
- * Example:  'closed-sign': 'closed-sign.png',   // also needs closed-sign-still.png
+ * Her drawings, the code way. Filenames are relative to public/doodles/; a still frame
+ * named "<file>-still.png" must sit next to each one.
+ * Example:  header: 'header.png',
  */
 export const doodleFiles: Partial<Record<DoodleName, string>> = {};

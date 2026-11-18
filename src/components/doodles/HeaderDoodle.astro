@@ -1,0 +1,168 @@
+---
+// The drawing beside the site name. Four built-in kinds, picked in the CMS:
+//   cup    a cup on a saucer, steam rising on a slow stepped loop
+//   pencil a pencil over a half-written line, rocking a little
+//   leaf   a sprig that sways
+//   moon   a crescent with two stars that take turns blinking
+// Decorative (aria-hidden). Slot: header, 120 x 120 (draw at 240 x 240).
+import DoodleSlot from './DoodleSlot.astro';
+import Boil from './Boil.astro';
+import type { HeaderKind } from '../../doodles';
+
+interface Props {
+  kind: Exclude<HeaderKind, 'none'>;
+}
+const { kind } = Astro.props;
+const AMOUNT = 0.7;
+
+// --- cup (C curves only; see src/lib/wobble.ts: no arcs) ---
+const cup = [
+  'M 100,101 C 100,104.9 82.1,108 60,108 C 37.9,108 20,104.9 20,101 C 20,97.1 37.9,94 60,94 C 82.1,94 100,97.1 99.4,100.3',
+  'M 44,108.5 C 47,112 73,112 76,108.5',
+  'M 86,52 C 86,55 74.4,57.5 60,57.5 C 45.6,57.5 34,55 34,52 C 34,49 45.6,46.5 60,46.5 C 74.4,46.5 86,49 86.6,51.4',
+  'M 43,53.5 C 49,56.5 71,56.5 77,53.5',
+  'M 34.5,54 C 36,68 39,82 43,92 C 48,97 72,97 77,92 C 81,82 84,68 85.5,54',
+  'M 84,62 C 103,57 105,84 79,85',
+  'M 84.5,68 C 95,66 96,80 81,80',
+];
+const wisps = [
+  'M 48,42 C 42,36 54,31 48,25 C 43,20 51,16 48,12',
+  'M 61,40 C 54,33 68,28 61,21 C 55,15 65,12 61,9',
+  'M 73,42 C 68,37 79,32 73,26 C 68,21 76,17 73,13',
+];
+
+// --- pencil: a diagonal pencil, its tip at the end of a half-written line ---
+const pencil = [
+  'M 36,86 C 52,70 68,54 84,38',          // lower edge of the body
+  'M 44,94 C 60,78 76,62 92,46',          // upper edge
+  'M 84,38 C 88,34 94,40 92,46',          // cap end
+  'M 80,42 C 84,46 88,50 88,50.5',        // band below the cap
+  'M 36,86 C 33,90 30,95 29,99',          // tip, two sides
+  'M 44,94 C 40,96 34,98 29,99',
+  'M 29,99 L 32,95',                      // the lead
+];
+const written = ['M 14,104 C 28,100 40,106 52,102 C 64,98 74,104 86,101 C 94,99 102,102 110,100'];
+
+// --- leaf: a sprig, drawn from the base up ---
+const sprig = [
+  'M 60,112 C 58,92 62,70 60,40',                                  // stem
+  'M 60,96 C 48,93 39,81 43,70 C 54,74 60,85 60.5,96.5',           // leaves, alternating sides
+  'M 60,80 C 72,77 81,65 77,54 C 66,58 60,69 59.5,80.5',
+  'M 60,62 C 48,59 41,47 45,36 C 56,40 60,51 60.5,62.5',
+  'M 60,44 C 64,33 70,27 72,20 C 64,24 58,33 59.5,44.5',           // the top leaf
+  'M 52,84 C 56,82 59,80 60,79',                                   // a vein or two
+  'M 70,66 C 66,64 63,62 61,61',
+];
+
+// --- moon: a crescent and two four-point stars ---
+const moon = [
+  'M 72,20 C 48,22 32,42 34,66 C 36,90 58,106 80,100 C 60,92 48,76 51,56 C 54,40 60,28 72.5,20.5',
+  'M 64,34 C 66,36 68,36 70,35',                                   // a dimple
+];
+const stars = [
+  ['M 94,34 L 94,48', 'M 87,41 L 101,41'],
+  ['M 90,74 L 90,82', 'M 86,78 L 94,78'],
+];
+---
+<DoodleSlot name="header">
+  <svg viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+    {kind === 'cup' && (
+      <>
+        {wisps.map((d, i) => (
+          <g class={`wisp wisp-${i + 1}`}><Boil paths={[d]} amount={AMOUNT} /></g>
+        ))}
+        <Boil paths={cup} amount={AMOUNT} />
+      </>
+    )}
+    {kind === 'pencil' && (
+      <>
+        <g class="pencil"><Boil paths={pencil} amount={AMOUNT} /></g>
+        <Boil paths={written} amount={0.5} />
+      </>
+    )}
+    {kind === 'leaf' && (
+      <g class="sprig"><Boil paths={sprig} amount={AMOUNT} /></g>
+    )}
+    {kind === 'moon' && (
+      <>
+        <Boil paths={moon} amount={AMOUNT} />
+        {stars.map((s, i) => (
+          <g class={`star star-${i + 1}`}><Boil paths={s} amount={0.4} /></g>
+        ))}
+      </>
+    )}
+  </svg>
+</DoodleSlot>
+
+<style>
+  .wisp {
+    opacity: 0.85;
+  }
+  .pencil,
+  .sprig {
+    transform-box: view-box;
+  }
+  .pencil {
+    transform-origin: 29px 99px; /* the tip stays on the paper */
+  }
+  .sprig {
+    transform-origin: 60px 112px; /* sways from the base */
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .wisp {
+      animation: header-steam 3.6s steps(1, end) infinite;
+    }
+    .wisp-1 {
+      animation-delay: -1.2s;
+    }
+    .wisp-3 {
+      animation-delay: -2.4s;
+    }
+    .pencil {
+      animation: header-pencil 2.8s steps(1, end) infinite;
+    }
+    .sprig {
+      animation: header-sway 4.8s steps(1, end) infinite;
+    }
+    .star {
+      animation: header-blink 2.4s steps(1, end) infinite;
+    }
+    .star-2 {
+      animation-delay: -1.2s;
+    }
+
+    @keyframes header-steam {
+      0% { transform: translateY(calc(3px * var(--motion))); opacity: 0.3; }
+      16.66% { transform: translateY(calc(1.5px * var(--motion))); opacity: 0.7; }
+      33.33% { transform: translateY(0); opacity: 1; }
+      50% { transform: translateY(calc(-2.5px * var(--motion))); opacity: 0.85; }
+      66.66% { transform: translateY(calc(-5px * var(--motion))); opacity: 0.55; }
+      83.33% { transform: translateY(calc(-7.5px * var(--motion))); opacity: 0.25; }
+      100% { transform: translateY(calc(-9px * var(--motion))); opacity: 0; }
+    }
+    @keyframes header-pencil {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(calc(2.5deg * var(--motion))); }
+      50% { transform: rotate(calc(0.5deg * var(--motion))); }
+      75% { transform: rotate(calc(-2deg * var(--motion))); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes header-sway {
+      0% { transform: rotate(0deg); }
+      20% { transform: rotate(calc(1.5deg * var(--motion))); }
+      40% { transform: rotate(calc(2.5deg * var(--motion))); }
+      60% { transform: rotate(calc(1deg * var(--motion))); }
+      80% { transform: rotate(calc(-1.5deg * var(--motion))); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes header-blink {
+      0% { opacity: 1; }
+      45% { opacity: 1; }
+      50% { opacity: 0.15; }
+      70% { opacity: 0.15; }
+      75% { opacity: 1; }
+      100% { opacity: 1; }
+    }
+  }
+</style>

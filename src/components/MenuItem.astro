@@ -15,8 +15,10 @@ interface Props {
 }
 const { post, index } = Astro.props;
 
-const DOODLES = ['whisk', 'crumb', 'star'] as const;
-const doodle = DOODLES[index % DOODLES.length];
+// The drawings rotate through whatever is chosen in Site settings > Look.
+const kinds = getSite().look.item_doodles;
+const doodle = kinds.length ? kinds[index % kinds.length] : undefined;
+const slot = (['a', 'b', 'c'] as const)[index % 3];
 
 /** "12 sep" — where a price would go. Dates are stored as plain days, so read them in UTC. */
 function shortDate(d: Date): string {
@@ -30,7 +32,7 @@ const cover = post.data.cover;
 ---
 
 <a class="menu-item" href={href}>
-  <span class="menu-item__doodle" aria-hidden="true">{getSite().look.show_item_doodles && <ItemDoodle kind={doodle} />}</span>
+  <span class="menu-item__doodle" aria-hidden="true">{doodle && <ItemDoodle kind={doodle} slot={slot} />}</span>
 
   <span class="menu-item__main">
     <span class="menu-item__line">

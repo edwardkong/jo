@@ -1,28 +1,30 @@
 {
   "name": "Small Hours",
   "intro": "things I made, and things I thought about while making them.",
-  "badge_text": "closed",
-  "badge_link": "",
   "footer": "",
   "noindex": true,
+  "notes_endpoint": "",
+  "turnstile_site_key": "",
   "wording": {
-    "home_tab": "home",
     "back_link": "← back",
     "empty_section": "nothing here yet.",
+    "comments_title": "comments",
+    "comments_form_hint": "no account needed. it appears after a minute or two.",
+    "comments_submit": "post",
+    "not_found_title": "nothing here."
+  },
+  "wording_advanced": {
+    "home_tab": "home",
     "unsorted_title": "Unsorted",
     "unsorted_blurb": "",
-    "comments_title": "comments",
     "comments_empty": "no comments yet.",
-    "comments_form_hint": "no account needed. it appears after a minute or two.",
     "comments_name_label": "name (optional)",
     "comments_body_label": "comment",
-    "comments_submit": "post",
     "comments_sent": "posted. it will appear once the page has rebuilt, a minute or two.",
     "comments_failed": "that did not go through. try again in a moment.",
     "comments_off": "comments are switched off.",
     "comments_anonymous": "anonymous",
     "not_found_tab": "not found",
-    "not_found_title": "nothing here.",
     "not_found_text": "that page doesn't exist, or it did once and doesn't now."
   },
   "look": {
@@ -34,10 +36,13 @@
     "color_ink_soft": "#7c6a57",
     "color_accent": "#b5452f",
     "favicon": "",
-    "show_header_doodle": true,
-    "show_item_doodles": true,
-    "show_footer_doodle": true,
-    "show_badge": true,
-    "drawings": []
+    "drawings": [],
+    "header_doodle": "cup",
+    "item_doodles": [
+      "whisk",
+      "crumb",
+      "star"
+    ],
+    "footer_doodle": "pin"
   }
 }

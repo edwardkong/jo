@@ -192,7 +192,7 @@ content:
   # Site settings: one JSON file with the name over the door, the sign, the footer.
   - name: site
     label: Site settings
-    description: Name, intro, sign, footer, and every phrase the site prints.
+    description: Name, intro, footer, the look, and every phrase the site prints.
     type: file
     path: src/data/site.json
     format: json
@@ -206,14 +206,6 @@ content:
         label: Intro
         type: text
         description: "A sentence or two under the name."
-      - name: badge_text
-        label: Badge text
-        type: string
-        description: "A word or two on the small hanging badge at the bottom of the homepage. Empty leaves it blank."
-      - name: badge_link
-        label: Badge link
-        type: string
-        description: "Where the badge goes when tapped. Leave empty and it is not a link."
       - name: footer
         label: Footer
         type: string
@@ -273,24 +265,44 @@ content:
             label: Tab icon
             type: string
             description: "An emoji or a letter or two, shown in the browser tab. Empty keeps the drawn default."
-          - name: show_header_doodle
-            label: Show the drawing beside the site name
-            type: boolean
-            default: true
-          - name: show_item_doodles
-            label: Show the small drawings beside each post
-            type: boolean
-            default: true
-          - name: show_badge
-            label: Show the hanging badge
-            type: boolean
-            default: true
-          - name: show_footer_doodle
-            label: Show the drawing at the end of a post
-            type: boolean
-            default: true
+          - name: header_doodle
+            label: Drawing beside the site name
+            type: select
+            default: cup
+            options:
+              values:
+                - { value: cup, label: "cup (steam rising)" }
+                - { value: pencil, label: "pencil" }
+                - { value: leaf, label: "leaf" }
+                - { value: moon, label: "moon and stars" }
+                - { value: none, label: "none" }
+          - name: item_doodles
+            label: Drawings beside posts
+            type: select
+            description: "Pick any number; posts take turns. Pick none to leave the space empty."
+            options:
+              multiple: true
+              values:
+                - { value: whisk, label: "whisk" }
+                - { value: crumb, label: "crumbs" }
+                - { value: star, label: "star" }
+                - { value: dot, label: "dot" }
+                - { value: leaf, label: "leaf" }
+                - { value: heart, label: "heart" }
+                - { value: spiral, label: "spiral" }
+                - { value: arrow, label: "arrow" }
+          - name: footer_doodle
+            label: Drawing at the end of a post
+            type: select
+            default: pin
+            options:
+              values:
+                - { value: pin, label: "rolling pin" }
+                - { value: dots, label: "dots" }
+                - { value: line, label: "a line drawing itself" }
+                - { value: none, label: "none" }
           - name: drawings
-            label: Drawings
+            label: Drawings (your own)
             type: object
             list: true
             description: "Replace a built-in drawing with your own. Upload a GIF, animated PNG or WebP drawn at twice the slot size (sizes are listed in the README and on /doodles). Add a still frame too; people who turn off motion see that one."
@@ -301,12 +313,11 @@ content:
                 required: true
                 options:
                   values:
-                    - { value: header-steam, label: "Beside the site name (120 × 120)" }
-                    - { value: closed-sign, label: "The hanging badge (160 × 110)" }
-                    - { value: item-whisk, label: "Beside posts, first of three (40 × 40)" }
-                    - { value: item-crumb, label: "Beside posts, second of three (40 × 40)" }
-                    - { value: item-star, label: "Beside posts, third of three (40 × 40)" }
-                    - { value: footer-crumbs, label: "End of a post (240 × 60)" }
+                    - { value: header, label: "Beside the site name (120 × 120)" }
+                    - { value: item-a, label: "Beside posts, 1st/4th/7th (40 × 40)" }
+                    - { value: item-b, label: "Beside posts, 2nd/5th/8th (40 × 40)" }
+                    - { value: item-c, label: "Beside posts, 3rd/6th/9th (40 × 40)" }
+                    - { value: footer, label: "End of a post (240 × 60)" }
               - name: file
                 label: Animated file
                 type: image
@@ -323,12 +334,8 @@ content:
       - name: wording
         label: Wording
         type: object
-        description: "Every phrase the site prints that is not a post. Change any of them; the layout does not care."
+        description: "The phrases people see most. The rest are under Wording (advanced)."
         fields:
-          - name: home_tab
-            label: Homepage tab title
-            type: string
-            description: "Browser tab title of the homepage."
           - name: back_link
             label: Back link
             type: string
@@ -337,6 +344,29 @@ content:
             label: Empty section line
             type: string
             description: "Shown under a section with no posts yet."
+          - name: comments_title
+            label: Comments heading
+            type: string
+            description: "Above the comments under a post."
+          - name: comments_form_hint
+            label: Comment form hint
+            type: text
+            description: "The sentence at the top of the comment form."
+          - name: comments_submit
+            label: Send button
+            type: string
+          - name: not_found_title
+            label: Not-found heading
+            type: string
+      - name: wording_advanced
+        label: Wording (advanced)
+        type: object
+        description: "Smaller phrases: tab titles, form labels, status messages. Fine to leave as they are."
+        fields:
+          - name: home_tab
+            label: Homepage tab title
+            type: string
+            description: "Browser tab title of the homepage."
           - name: unsorted_title
             label: Unsorted section title
             type: string
@@ -345,26 +375,15 @@ content:
             label: Unsorted section description
             type: string
             description: "Line under that heading. Optional."
-          - name: comments_title
-            label: Comments heading
-            type: string
-            description: "Above the comments under a post."
           - name: comments_empty
             label: No comments yet
             type: string
             description: "Shown when a post has no comments."
-          - name: comments_form_hint
-            label: Comment form hint
-            type: text
-            description: "The sentence under that label."
           - name: comments_name_label
             label: Name field label
             type: string
           - name: comments_body_label
             label: Comment field label
-            type: string
-          - name: comments_submit
-            label: Send button
             type: string
           - name: comments_sent
             label: After sending
@@ -382,9 +401,6 @@ content:
             type: string
           - name: not_found_tab
             label: Not-found tab title
-            type: string
-          - name: not_found_title
-            label: Not-found heading
             type: string
           - name: not_found_text
             label: Not-found text

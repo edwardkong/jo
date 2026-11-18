@@ -19,7 +19,7 @@ interface Props {
 }
 const { post } = Astro.props;
 const { Content } = await render(post);
-const { wording } = getSite();
+const { wording, look } = getSite();
 
 // "From the oven", looked up from the section files; the raw id if the file is gone.
 const sections = await getCollection('sections');
@@ -76,9 +76,9 @@ const cover = post.data.cover;
 
   <CommentsSlot postId={post.id} />
 
-  {wording && getSite().look.show_footer_doodle && (
+  {look.footer_doodle !== 'none' && (
     <div class="post__crumbs wrap" aria-hidden="true">
-      <FooterDoodle />
+      <FooterDoodle kind={look.footer_doodle} />
     </div>
   )}
 </Base>
