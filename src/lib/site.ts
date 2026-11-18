@@ -12,7 +12,6 @@ const WordingSchema = z.object({
   unsorted_blurb: z.string().default(''),
   comments_title: z.string().default('comments'),
   comments_empty: z.string().default('no comments yet.'),
-  comments_form_label: z.string().default('leave a comment'),
   comments_form_hint: z.string().default('no account needed. it appears after a minute or two.'),
   comments_name_label: z.string().default('name (optional)'),
   comments_body_label: z.string().default('comment'),
@@ -28,6 +27,28 @@ const WordingSchema = z.object({
 
 export type Wording = z.infer<typeof WordingSchema>;
 
+const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'a colour like #2c2219');
+
+// Fonts, colours, favicon, and which drawings show. Edited in the CMS under
+// Site settings > Look. Fonts are Google Fonts family names, fetched at build time.
+const LookSchema = z.object({
+  font_heading: z.string().default('Gaegu'),
+  font_body: z.string().default('Literata'),
+  color_background: hex.default('#f3ead9'),
+  color_background_deep: hex.default('#e9dcc4'),
+  color_ink: hex.default('#2c2219'),
+  color_ink_soft: hex.default('#7c6a57'),
+  color_accent: hex.default('#b5452f'),
+  /** An emoji or 1-2 characters drawn into the tab icon. Empty = the drawn default. */
+  favicon: z.string().default(''),
+  show_header_doodle: z.boolean().default(true),
+  show_item_doodles: z.boolean().default(true),
+  show_sign: z.boolean().default(true),
+  show_footer_doodle: z.boolean().default(true),
+});
+
+export type Look = z.infer<typeof LookSchema>;
+
 const SiteSchema = z.object({
   name: z.string().default('Untitled'),
   intro: z.string().default(''),
@@ -42,6 +63,7 @@ const SiteSchema = z.object({
   /** Cloudflare Turnstile site key (public). Empty = no captcha widget. */
   turnstile_site_key: z.string().default(''),
   wording: WordingSchema.default({}),
+  look: LookSchema.default({}),
 });
 
 export type SiteSettings = z.infer<typeof SiteSchema>;

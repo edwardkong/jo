@@ -2,18 +2,20 @@
 // Homepage header: the bakery name, a cup of something steaming beside it,
 // and the intro line underneath.
 import SteamCup from './doodles/SteamCup.astro';
+import { getSite } from '../lib/site';
 
 interface Props {
   name: string;
   intro?: string;
 }
 const { name, intro = '' } = Astro.props;
+const showCup = getSite().look.show_header_doodle;
 ---
 
 <header class="site-head wrap">
   <div class="site-head__row">
     <h1 class="site-head__name">{name}</h1>
-    <div class="site-head__cup"><SteamCup /></div>
+    {showCup && <div class="site-head__cup"><SteamCup /></div>}
   </div>
   {intro && <p class="site-head__intro">{intro}</p>}
 </header>

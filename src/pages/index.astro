@@ -29,7 +29,7 @@ const shelves = menu.map((section) => {
     ))}
   </div>
 
-  <ClosedSign text={site.sign_text} href={site.sign_link} />
+  {site.look.show_sign && <ClosedSign text={site.sign_text} href={site.sign_link} />}
 </Base>
 
 <style>

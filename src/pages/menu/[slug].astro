@@ -76,9 +76,11 @@ const cover = post.data.cover;
 
   <CommentsSlot postId={post.id} />
 
-  <div class="post__crumbs wrap" aria-hidden="true">
-    <FooterDoodle />
-  </div>
+  {wording && getSite().look.show_footer_doodle && (
+    <div class="post__crumbs wrap" aria-hidden="true">
+      <FooterDoodle />
+    </div>
+  )}
 </Base>
 
 <style>

@@ -231,6 +231,64 @@ content:
         label: Captcha site key (owner)
         type: string
         description: "Cloudflare Turnstile site key. Empty means no captcha. Set by the owner."
+      - name: look
+        label: Look
+        type: object
+        description: "Fonts, colours, tab icon, and which drawings show. The site rebuilds with the new look after you save."
+        fields:
+          - name: font_heading
+            label: Heading font
+            type: string
+            description: "A Google Fonts family name, spelled exactly as on fonts.google.com (e.g. Gaegu, Caveat, Patrick Hand). Used for titles, headings, dates, the sign."
+          - name: font_body
+            label: Body font
+            type: string
+            description: "A Google Fonts family name for the writing (e.g. Literata, Lora, Source Serif 4). Pick one that has an italic."
+          - name: color_background
+            label: Background colour
+            type: string
+            pattern: "^#[0-9a-fA-F]{6}$"
+            description: "Six-digit hex, like #f3ead9."
+          - name: color_background_deep
+            label: Background, darker shade
+            type: string
+            pattern: "^#[0-9a-fA-F]{6}$"
+            description: "For rules, borders and photo edges."
+          - name: color_ink
+            label: Text colour
+            type: string
+            pattern: "^#[0-9a-fA-F]{6}$"
+            description: "Also the colour of the drawings."
+          - name: color_ink_soft
+            label: Text colour, lighter
+            type: string
+            pattern: "^#[0-9a-fA-F]{6}$"
+            description: "Descriptions, dates, small print."
+          - name: color_accent
+            label: Accent colour
+            type: string
+            pattern: "^#[0-9a-fA-F]{6}$"
+            description: "Hover underline, focus outline, the quote rule. Used sparingly."
+          - name: favicon
+            label: Tab icon
+            type: string
+            description: "An emoji or a letter or two, shown in the browser tab. Empty keeps the drawn default."
+          - name: show_header_doodle
+            label: Show the drawing beside the site name
+            type: boolean
+            default: true
+          - name: show_item_doodles
+            label: Show the small drawings beside each post
+            type: boolean
+            default: true
+          - name: show_sign
+            label: Show the hanging sign
+            type: boolean
+            default: true
+          - name: show_footer_doodle
+            label: Show the drawing at the end of a post
+            type: boolean
+            default: true
       - name: wording
         label: Wording
         type: object
@@ -264,10 +322,6 @@ content:
             label: No comments yet
             type: string
             description: "Shown when a post has no comments."
-          - name: comments_form_label
-            label: Comment form label
-            type: string
-            description: "Small caps label on the form."
           - name: comments_form_hint
             label: Comment form hint
             type: text

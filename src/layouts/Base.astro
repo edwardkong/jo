@@ -17,6 +17,13 @@ interface Props {
 const site = getSite();
 const { title, description = site.intro } = Astro.props;
 const fullTitle = `${title} · ${site.name}`;
+const look = site.look;
+// Colours from Site settings override the defaults in global.css.
+const themeVars = `html:root{--paper:${look.color_background};--paper-deep:${look.color_background_deep};--ink:${look.color_ink};--ink-soft:${look.color_ink_soft};--accent:${look.color_accent};}`;
+// An emoji (or a letter or two) as the tab icon, drawn into an SVG on the spot.
+const emojiIcon = look.favicon.trim()
+  ? `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text x="32" y="52" font-size="52" text-anchor="middle">${look.favicon.trim().slice(0, 2)}</text></svg>`)}`
+  : withBase('favicon.svg');
 ---
 
 <!doctype html>
@@ -28,11 +35,12 @@ const fullTitle = `${title} · ${site.name}`;
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
     {site.noindex && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" content="#f3ead9" />
-    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+    <meta name="theme-color" content={look.color_background} />
+    <link rel="icon" type="image/svg+xml" href={emojiIcon} />
     {/* Self-hosted fonts (see astro.config.mjs). Preload the faces used above the fold. */}
     <Font cssVariable="--font-hand" preload />
     <Font cssVariable="--font-body" preload={[{ style: 'normal' }]} />
+    <style is:inline set:html={themeVars}></style>
   </head>
   <body>
     <a class="skip-link" href="#main">skip to the menu</a>

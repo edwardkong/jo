@@ -127,6 +127,12 @@ Under every post there is an "order slip" where anyone can leave a short note, w
 
 If the site moves to another host, change `SITE_URL` in `worker/wrangler.toml` and redeploy the Worker; the form's address does not change.
 
+## Changing the look (fonts, colours, icon, drawings)
+
+Site settings > **Look** in Pages CMS. Fonts are Google Fonts family names typed exactly as on fonts.google.com; the build downloads them and serves them from the site itself, so nothing is fetched from Google by readers. Colours are six-digit hex values; the drawings pick up the text colour automatically. The tab icon takes an emoji. Four switches hide or show the drawings beside the name, beside each post, the sign, and the one at the end of a post. Every change rebuilds the site. If a font name is misspelled the build fails and the owner gets an email from GitHub; fix the name and save again.
+
+The drawings themselves are replaced by files, not settings: see "Doodles" above.
+
 ## Custom domain
 
 The site can live at its own address (say `smallhours.example`) instead of `edwardkong.github.io/jo/`. The build is already prepared for it; the switch is one setting plus DNS.

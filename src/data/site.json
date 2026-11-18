@@ -13,7 +13,6 @@
     "unsorted_blurb": "",
     "comments_title": "comments",
     "comments_empty": "no comments yet.",
-    "comments_form_label": "leave a comment",
     "comments_form_hint": "no account needed. it appears after a minute or two.",
     "comments_name_label": "name (optional)",
     "comments_body_label": "comment",
@@ -25,5 +24,19 @@
     "not_found_tab": "not found",
     "not_found_title": "nothing here.",
     "not_found_text": "that page doesn't exist, or it did once and doesn't now."
+  },
+  "look": {
+    "font_heading": "Gaegu",
+    "font_body": "Literata",
+    "color_background": "#f3ead9",
+    "color_background_deep": "#e9dcc4",
+    "color_ink": "#2c2219",
+    "color_ink_soft": "#7c6a57",
+    "color_accent": "#b5452f",
+    "favicon": "",
+    "show_header_doodle": true,
+    "show_item_doodles": true,
+    "show_sign": true,
+    "show_footer_doodle": true
   }
 }

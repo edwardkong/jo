@@ -6,6 +6,7 @@ import { Image } from 'astro:assets';
 import type { Post } from '../lib/menu';
 import { withBase } from '../lib/url';
 import ItemDoodle from './doodles/ItemDoodle.astro';
+import { getSite } from '../lib/site';
 
 interface Props {
   post: Post;
@@ -29,7 +30,7 @@ const cover = post.data.cover;
 ---
 
 <a class="menu-item" href={href}>
-  <span class="menu-item__doodle" aria-hidden="true"><ItemDoodle kind={doodle} /></span>
+  <span class="menu-item__doodle" aria-hidden="true">{getSite().look.show_item_doodles && <ItemDoodle kind={doodle} />}</span>
 
   <span class="menu-item__main">
     <span class="menu-item__line">

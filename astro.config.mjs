@@ -3,6 +3,14 @@ import { defineConfig, fontProviders } from 'astro/config';
 import { satteri } from '@astrojs/markdown-satteri';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import siteSettings from './src/data/site.json' with { type: 'json' };
+
+// Fonts come from Site settings > Look (Google Fonts family names). Gaegu goes through
+// Fontsource because Google serves it as ~90 unicode slices per weight.
+const look = siteSettings.look ?? {};
+const headingFont = look.font_heading || 'Gaegu';
+const bodyFont = look.font_body || 'Literata';
+const providerFor = (name) => (name === 'Gaegu' ? fontProviders.fontsource() : fontProviders.google());
 
 const projectRoot = fileURLToPath(new URL('.', import.meta.url));
 
@@ -47,24 +55,21 @@ export default defineConfig({
   },
   fonts: [
     {
-      // Handwritten face for the menu: names, headings, the sign.
-      // Fontsource rather than Google: Gaegu is a Korean face and Google serves it as
-      // ~90 numbered slices per weight that the `subsets` filter can't drop (178 files,
-      // 178 preload tags). Fontsource ships one latin file per weight. Downloaded at
-      // build time and self-hosted like the rest; nothing is fetched at runtime.
-      provider: fontProviders.fontsource(),
-      name: 'Gaegu',
+      // Handwritten face: names, headings, the sign. Weights kept to 400/700 so any
+      // family on Google Fonts works; nothing is fetched at runtime.
+      provider: providerFor(headingFont),
+      name: headingFont,
       cssVariable: '--font-hand',
       weights: [400, 700],
       subsets: ['latin'],
-      fallbacks: ['Comic Sans MS', 'cursive'],
+      fallbacks: ['cursive'],
     },
     {
       // Reading face for the writing itself.
-      provider: fontProviders.google(),
-      name: 'Literata',
+      provider: providerFor(bodyFont),
+      name: bodyFont,
       cssVariable: '--font-body',
-      weights: ['300 700'],
+      weights: [400, 700],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],

@@ -60,7 +60,6 @@ function shortDate(d: Date): string {
     data-msg-sent={w.comments_sent}
     data-msg-failed={w.comments_failed}
   >
-    <p class="order-slip__label">{w.comments_form_label}</p>
     <p class="order-slip__hint">{w.comments_form_hint}</p>
 
     <input type="hidden" name="post" value={postId} />
@@ -194,26 +193,16 @@ function shortDate(d: Date): string {
   }
 
   /* The order slip: a dashed ticket, slightly askew. */
+  /* The form spans the same column as the writing and the comments above it. */
   .order-slip {
     margin-top: 1.75rem;
     padding: 1rem 1.1rem 1.1rem;
     border: 2px dashed var(--ink-soft);
     border-radius: 4px;
     background: rgba(255, 253, 248, 0.5);
-    transform: rotate(-0.5deg);
-    max-width: 28rem;
-  }
-
-  .order-slip__label {
-    font-family: var(--hand);
-    font-size: 1rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
   }
 
   .order-slip__hint {
-    margin-top: 0.35rem;
     font-family: var(--hand);
     font-size: 1.25rem;
     line-height: 1.2;
