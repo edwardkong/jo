@@ -265,7 +265,7 @@ content:
             label: Text colour
             type: string
             pattern: "^#[0-9a-fA-F]{6}$"
-            description: "Also the colour of the drawings."
+            description: "Also the colour of the icons."
           - name: color_ink_soft
             label: Text colour, lighter
             type: string
