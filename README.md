@@ -185,7 +185,7 @@ The site is a menu that is secretly a blog. There are three kinds of page:
 | Doodle animations | `src/styles/doodles.css` and `src/components/doodles/` |
 | The little browser-tab icon (a mug) | `public/favicon.svg` |
 
-Words like the bakery name, the intro line, the sign text and the footer line come from `src/data/site.json` (edited in the CMS under "Site settings"), not from these files.
+Words like the site name, the intro line and the footer line come from `src/data/site.json` (edited in the CMS under "Site settings"), not from these files.
 
 ### Changing colours
 
