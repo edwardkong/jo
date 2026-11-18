@@ -164,7 +164,7 @@ Until then the GitHub address keeps working. After the switch, GitHub redirects 
 
 The site is a menu that is secretly a blog. There are three kinds of page:
 
-- **The menu** (`/`) — the bakery name, the intro line, one "shelf" per section with its posts, the hanging sign, and the footer line.
+- **The homepage** (`/`) — the site name, the intro line, one block per section with its posts, and the footer line.
 - **A post** (`/menu/<post-name>/`) — "← back to the menu", the title, "which shelf · long date", the cover photo (if there is one), the writing, an order slip where comments will go one day, and the crumbs doodle.
 - **Not found** (`/404`) — "we're out of that." with a link back.
 
