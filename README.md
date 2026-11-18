@@ -127,6 +127,18 @@ Under every post there is an "order slip" where anyone can leave a short note, w
 
 If the site moves to another host, change `SITE_URL` in `worker/wrangler.toml` and redeploy the Worker; the form's address does not change.
 
+## Custom domain
+
+The site can live at its own address (say `smallhours.example`) instead of `edwardkong.github.io/jo/`. The build is already prepared for it; the switch is one setting plus DNS.
+
+1. **Buy the domain** anywhere (Cloudflare Registrar and Porkbun are cheap and plain).
+2. **DNS at the registrar.** For a subdomain like `www.smallhours.example`: one CNAME record pointing to `edwardkong.github.io`. For the bare domain `smallhours.example`: four A records to GitHub Pages' addresses, `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` (and the same CNAME for `www` so both work). If the registrar offers a proxy or "orange cloud", leave it off at first.
+3. **Tell the build.** On GitHub: repo Settings, Secrets and variables, Actions, Variables, new variable `CUSTOM_DOMAIN` = `smallhours.example`. Push anything, or run the Deploy workflow by hand; the site rebuilds with clean `/menu/...` links and a `CNAME` file.
+4. **Tell GitHub Pages.** Repo Settings, Pages, Custom domain: enter the domain, wait for the DNS check, then tick Enforce HTTPS (the certificate takes a few minutes to appear).
+5. **Tell the notes Worker.** In `worker/wrangler.toml` change `SITE_URL` to `https://smallhours.example` and run `npx wrangler deploy` again; also move the Turnstile widget to the new hostname in the Cloudflare dashboard.
+
+Until then the GitHub address keeps working. After the switch, GitHub redirects the old address to the new one.
+
 ## Owner setup
 1. **Install the Pages CMS GitHub App.** Push this repo to GitHub, sign in at app.pagescms.org with GitHub, and install the app on your account, granting access to this repository only. It needs read and write on contents.
 2. **Open the repo in Pages CMS.** It reads `.pages.yml` from the branch you pick (main). You should see Menu items, Menu sections, Site settings and Photos. If the config has a problem, the CMS shows the validation error on its Settings page; the file was checked against the Pages CMS 2.1.8 validator, so a problem most likely means a typo from a later edit.

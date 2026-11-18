@@ -1,5 +1,10 @@
 # Builds the site and publishes it to GitHub Pages on every push to main.
 # (Netlify does not use this file; it reads netlify.toml instead.)
+#
+# Custom domain: set a repository variable named CUSTOM_DOMAIN (Settings > Secrets and
+# variables > Actions > Variables) to e.g. "smallhours.example". The build then drops the
+# /<repo>/ prefix and writes the CNAME file GitHub Pages needs. Leave it unset to serve
+# from https://<user>.github.io/<repo>/.
 name: Deploy to GitHub Pages
 
 on:
@@ -20,11 +25,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Project pages live at https://<user>.github.io/<repo>/ so the site needs a base path.
-      SITE_URL: https://${{ github.repository_owner }}.github.io
-      SITE_BASE: /${{ github.event.repository.name }}
+      CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
     steps:
       - uses: actions/checkout@v7
+      - name: Decide where the site lives
+        run: |
+          if [ -n "$CUSTOM_DOMAIN" ]; then
+            echo "SITE_URL=https://$CUSTOM_DOMAIN" >> "$GITHUB_ENV"
+            echo "SITE_BASE=/" >> "$GITHUB_ENV"
+            echo "$CUSTOM_DOMAIN" > public/CNAME
+          else
+            echo "SITE_URL=https://${{ github.repository_owner }}.github.io" >> "$GITHUB_ENV"
+            echo "SITE_BASE=/${{ github.event.repository.name }}" >> "$GITHUB_ENV"
+          fi
       - uses: withastro/action@v6
         with:
           node-version: 22
