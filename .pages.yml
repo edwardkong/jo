@@ -95,6 +95,21 @@ content:
         # No "required": an empty cover is fine, the site treats "" and missing the same.
         options:
           media: photos
+      - name: icon
+        label: Small drawing
+        type: select
+        description: "The drawing beside this post on the homepage. Leave empty and posts take turns through the ones chosen in Site settings."
+        options:
+          placeholder: "take turns (default)"
+          values:
+            - { value: whisk, label: "whisk" }
+            - { value: crumb, label: "crumbs" }
+            - { value: star, label: "star" }
+            - { value: dot, label: "dot" }
+            - { value: leaf, label: "leaf" }
+            - { value: heart, label: "heart" }
+            - { value: spiral, label: "spiral" }
+            - { value: arrow, label: "arrow" }
       - name: draft
         label: Draft (hidden from the site)
         type: boolean

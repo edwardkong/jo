@@ -3,6 +3,7 @@ title: On keeping a notebook
 description: why I write things down, and why most of it stays there
 section: notes.yml
 date: 2026-08-30
+icon: leaf
 draft: false
 ---
 

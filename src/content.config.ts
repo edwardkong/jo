@@ -44,6 +44,8 @@ const posts = defineCollection({
       date: z.coerce.date(),
       cover: z.preprocess(emptyToUndefined, image().optional()),
       draft: z.boolean().default(false),
+      /** Which small drawing sits beside this post. Empty = take turns (Site settings > Look). */
+      icon: z.string().default(''),
     }),
 });
 

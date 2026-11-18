@@ -29,9 +29,10 @@ Everything happens at **app.pagescms.org** in your phone's browser. Sign in with
 4. **Section** – pick one from the list. If you delete a section later its posts don't vanish, they gather under the "unsorted" heading (its wording is yours to set) until you give them a home.
 5. **Date** – starts as today. Newer posts sit higher on the menu.
 6. **Cover photo** – optional. Tap it to pick from your camera roll. Keep it under about 3 MB (see photo tips).
-7. **Draft (hidden from the site)** – this is on for every new post. While it's on, the post is not built into the site at all, so nobody can see it, not even with the link. Switch it off when it's ready.
-8. **Body** – the toolbar gives you headings, bold and italic, lists, quotes and photos. There's a small toggle to see the plain-text (Markdown) version if you ever want it.
-9. Tap **Save**. The site rebuilds itself. Give it a minute or two, then refresh the page: a save takes about 40 seconds to build and up to another minute to reach everyone. If you look sooner you see the previous version, which is why a deleted post can seem to linger.
+7. **Small drawing** – optional. Pick which little drawing sits beside this post on the homepage, or leave it empty and posts take turns through the ones chosen in Site settings › Look.
+8. **Draft (hidden from the site)** – this is on for every new post. While it's on, the post is not built into the site at all, so nobody can see it, not even with the link. Switch it off when it's ready.
+9. **Body** – the toolbar gives you headings, bold and italic, lists, quotes and photos. There's a small toggle to see the plain-text (Markdown) version if you ever want it.
+10. Tap **Save**. The site rebuilds itself. Give it a minute or two, then refresh the page: a save takes about 40 seconds to build and up to another minute to reach everyone. If you look sooner you see the previous version, which is why a deleted post can seem to linger.
 
 To change a post later, tap it in the list, edit, save. Changing the name later does not change the web address (that was fixed the first time you saved), which is fine, just good to know.
 

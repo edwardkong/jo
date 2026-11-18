@@ -7,6 +7,7 @@ import type { Post } from '../lib/menu';
 import { withBase } from '../lib/url';
 import ItemDoodle from './doodles/ItemDoodle.astro';
 import { getSite } from '../lib/site';
+import { ITEM_KINDS, type ItemKind } from '../doodles';
 
 interface Props {
   post: Post;
@@ -15,9 +16,14 @@ interface Props {
 }
 const { post, index } = Astro.props;
 
-// The drawings rotate through whatever is chosen in Site settings > Look.
+// The post's own pick wins; otherwise the drawings take turns through Site settings > Look.
 const kinds = getSite().look.item_doodles;
-const doodle = kinds.length ? kinds[index % kinds.length] : undefined;
+const own = post.data.icon as ItemKind;
+const doodle: ItemKind | undefined = (ITEM_KINDS as readonly string[]).includes(own)
+  ? own
+  : kinds.length
+    ? kinds[index % kinds.length]
+    : undefined;
 const slot = (['a', 'b', 'c'] as const)[index % 3];
 
 /** "12 sep" — where a price would go. Dates are stored as plain days, so read them in UTC. */
